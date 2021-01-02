@@ -672,7 +672,7 @@ function singkron_master_cse(val){
 			};
 			chrome.runtime.sendMessage(data_prov, function(response) {
 			    console.log(response,'Provinsi');
-			});
+			// });
 			var last = data_prov_map.length-1;
 			data_prov_map.reduce(function(sequence, nextData){
                 return sequence.then(function(current_data){
@@ -714,7 +714,7 @@ function singkron_master_cse(val){
 							};
 							chrome.runtime.sendMessage(data_kab, function(response) {
 							    console.log(response,'Kabupaten untuk Provinsi: '+id_unit+', '+current_data.id_alamat);
-							});
+							// });
 							var last2 = data_kab_map.length-1;
 							data_kab_map.reduce(function(sequence2, nextData2){
 	                			return sequence2.then(function(current_data2){
@@ -756,7 +756,7 @@ function singkron_master_cse(val){
 											};
 											chrome.runtime.sendMessage(data_kec, function(response) {
 											    console.log(response,'Kecamatan untuk Kabupaten: '+id_unit+', '+current_data2.id_prov+', '+current_data2.id_alamat);
-											});
+											// });
 											var last3 = data_kec_map.length-1;
 											data_kec_map.reduce(function(sequence3, nextData3){
 					                			return sequence3.then(function(current_data3){
@@ -809,6 +809,7 @@ function singkron_master_cse(val){
 								            .then(function(data_last){
 								            	return resolve_reduce2(nextData2);
 								            });
+								            }); //
 										});
 									})
 					                .catch(function(e){
@@ -824,6 +825,7 @@ function singkron_master_cse(val){
 				            .then(function(data_last){
 				            	return resolve_reduce(nextData);
 				            });
+				            }); //
 						});
 					})
                     .catch(function(e){
@@ -840,6 +842,7 @@ function singkron_master_cse(val){
             	alert('Berhasil simpan data master Alamat!');
 				jQuery('#wrap-loading').hide();
             });
+            }); //
 		});
 	}else{
 		jQuery('#wrap-loading').hide();
