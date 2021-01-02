@@ -1513,7 +1513,7 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
                 		return new Promise(function(resolve_reduce, reject_reduce){
                         	if(current_data.nama_sub_giat.mst_lock != 3 && current_data.kode_sub_skpd){
 					console.log('Memproses singkron_rka_ke_lokal untuk sub kegiatan', current_data.kode_sbl);
-                        		cat_wp = current_data.kode_sub_skpd+' '+current_data.nama_sub_skpd;
+                        		cat_wp = current_data.nama_sub_skpd;
                         		var nama_skpd = current_data.nama_skpd.split(' ');
                         		nama_skpd.shift();
                         		nama_skpd = nama_skpd.join(' ');
