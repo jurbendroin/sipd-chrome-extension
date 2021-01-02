@@ -1781,7 +1781,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 							            data_rka.dataCapaian[i].targetcapaian = d.targetcapaian;
 									});
 
-									var _leng = 250;
+									// var _leng = 250;
 									var _data_all = [];
 									var _data = [];
 									data.data.map(function(rka, i){
@@ -1839,11 +1839,12 @@ function singkron_rka_ke_lokal(opsi, callback) {
 										_rka.idketerangan = 0;
 										_rka.idsubtitle = 0;
 										_data.push(_rka);
-										if((i+1)%_leng == 0){
-											_data_all.push(_data);
-											_data = [];
-										}
+										//if((i+1)%_leng == 0){
+										//	_data_all.push(_data);
+										//	_data = [];
+										//}
 									});
+									_data_all.push(_data);
 									if(_data.length > 0){
 										_data_all.push(_data);
 									}
