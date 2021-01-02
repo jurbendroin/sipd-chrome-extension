@@ -1450,7 +1450,7 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 		jQuery('#wrap-loading').show();
 		var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
 		if(opsi_unit && opsi_unit.id_skpd){
-			id_unit = opsi_unit.id_skpd;
+			id_unit = opsi_unit.id_unit;
 			var opsi = { 
 				action: 'set_unit_pagu',
 				api_key: config.api_key,
@@ -1519,6 +1519,8 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
                         		nama_skpd = nama_skpd.join(' ');
 								singkron_rka_ke_lokal({
 									id_unit: id_unit,
+									id_skpd: current_data.id_skpd,
+									id_sub_skpd: current_data.id_sub_skpd,
 									kode_bl: current_data.kode_bl,
 									kode_sbl: current_data.kode_sbl,
 									idbl: current_data.id_bl,
@@ -1526,6 +1528,7 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 									kode_skpd: current_data.kode_skpd,
 									nama_skpd: nama_skpd,
 									kode_sub_skpd: current_data.kode_sub_skpd,
+									nama_sub_skpd: current_data.nama_sub_skpd,
 									pagu: current_data.pagu,
 									no_return: true
 								}, function(){
@@ -1610,6 +1613,8 @@ function singkron_rka_ke_lokal(opsi, callback) {
 				}
 			});
 		}else{
+			id_skpd = opsi.id_skpd;
+			id_sub_skpd = opsi.id_sub_skpd;
 			kode_bl = opsi.kode_bl;
 			kode_sbl = opsi.kode_sbl;
 			idbl = opsi.idbl;
@@ -1617,6 +1622,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 			kode_skpd = opsi.kode_skpd;
 			nama_skpd = opsi.nama_skpd;
 			kode_sub_skpd = opsi.kode_sub_skpd;
+			nama_sub_skpd = opsi.nama_sub_skpd;
 			pagu = opsi.pagu;
 		}
 		if((idbl && idsubbl) || kode_sbl){
@@ -1644,9 +1650,9 @@ function singkron_rka_ke_lokal(opsi, callback) {
 										tahun_anggaran: config.tahun_anggaran,
 										api_key: config.api_key,
 										rka : {},
-										kode_skpd: kode_skpd,
-										nama_skpd: nama_skpd,
-										kode_sub_skpd: kode_sub_skpd,
+										// kode_skpd: kode_skpd,
+										// nama_skpd: nama_skpd,
+										// kode_sub_skpd: kode_sub_skpd,
 										pagu: pagu,
 										idbl: idbl,
 										idsubbl: idsubbl,
@@ -1667,6 +1673,11 @@ function singkron_rka_ke_lokal(opsi, callback) {
 									for(var j in data_unit){
 										data_rka.data_unit[j] = data_unit[j];
 									}
+									data_rka.data_unit['id_skpd'] = data.data[0].id_sub_skpd
+									data_rka.data_unit['idinduk'] = data.data[0].id_skpd
+									data_rka.data_unit['id_unit'] = data.data[0].id_unit
+									data_rka.data_unit['kode_skpd'] = data.data[0].kode_sub_skpd
+									data_rka.data_unit['nama_skpd'] = data.data[0].nama_sub_skpd
 									subkeg.dataOutputGiat.map(function(d, i){
 										data_rka.dataOutputGiat[i] = {};
 							            data_rka.dataOutputGiat[i].outputteks = d.outputteks;
