@@ -1631,6 +1631,8 @@ function singkron_rka_ke_lokal(opsi, callback) {
 				url: config.sipd_url+'daerah/main/budget/skpd/'+config.tahun_anggaran+'/detil-skpd/'+config.id_daerah+'/'+id_unit,
 				type: 'post',
 				data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idskpd='+id_unit,
+				tryCount : 0,
+				retryLimit : 10,
 				success: function(data_unit){
 					// get detail indikator kegiatan
 					jQuery.ajax({
@@ -1949,7 +1951,26 @@ function singkron_rka_ke_lokal(opsi, callback) {
 							});
 						}
 					});
-				}
+				},
+				error : function(xhr, textStatus, errorThrown ) {
+					if (textStatus == 'timeout') {
+						this.tryCount++;
+						if (this.tryCount <= this.retryLimit) {
+							console.log('Koneksi time out. Mencoba ke-'+this.tryCount+' pengambilan data', kode_sbl);
+							//try again
+							$.ajax(this);
+							return;
+						}
+						console.log('Koneksi time out. Gagal mengambil data', kode_sbl);
+						return;
+					}
+					if (xhr.status == 500) {
+						//handle error
+					} else {
+						//handle error
+					}
+				},
+				timeout: 30000
 			});
 		}else{
 			alert('ID Belanja tidak ditemukan!');
