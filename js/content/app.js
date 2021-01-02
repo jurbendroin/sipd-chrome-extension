@@ -61,13 +61,13 @@ jQuery(document).ready(function(){
 	){
 		console.log('halaman referensi SSH');
 		var singkron_ssh = ''
-			+'<button class="fcbtn btn btn-warning btn-outline btn-1b" id="singkron_ssh_ke_lokal">'
+			+'<button onClick="return false;" class="fcbtn btn btn-warning btn-outline btn-1b" id="singkron_ssh_ke_lokal">'
 				+'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron SSH ke DB lokal</span>'
 			+'</button>'
 			+'<button class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron_ssh_dari_lokal" style="display: none;">'
 				+'<i class="fa fa-cloud-upload m-r-5"></i> <span>Singkron SSH dari DB lokal</span>'
 			+'</button>';
-		jQuery('button.arsip-komponen').parent().prepend(singkron_ssh);
+		jQuery('#table_komponen').closest('form').prepend(singkron_ssh);
 		var _show_id_ssh = ''
 			+'<button onclick="return false;" class="fcbtn btn btn-warning btn-outline btn-1b" id="show_id_ssh">'
 				+'<i class="fa fa-eye m-r-5"></i> <span>Tampilkan ID Standar Harga</span>'
