@@ -671,13 +671,13 @@ function singkron_master_cse(val){
 			    }
 			};
 			chrome.runtime.sendMessage(data_prov, function(response) {
-			    console.log('responeMessage', response);
+			    console.log(response,'Provinsi');
 			});
 			var last = data_prov_map.length-1;
 			data_prov_map.reduce(function(sequence, nextData){
                 return sequence.then(function(current_data){
                 	return new Promise(function(resolve_reduce, reject_reduce){
-                		console.log('current_data', current_data);
+                		// console.log('current_data', current_data);
 						getKab(id_unit, current_data.id_alamat).then(function(kab){
 							var data_alamat_kab = { 
 								action: 'singkron_alamat',
@@ -713,13 +713,13 @@ function singkron_master_cse(val){
 							    }
 							};
 							chrome.runtime.sendMessage(data_kab, function(response) {
-							    console.log('responeMessage', response);
+							    console.log(response,'Kabupaten untuk Provinsi: '+id_unit+', '+current_data.id_alamat);
 							});
 							var last2 = data_kab_map.length-1;
 							data_kab_map.reduce(function(sequence2, nextData2){
 	                			return sequence2.then(function(current_data2){
                 					return new Promise(function(resolve_reduce2, reject_reduce2){
-                						console.log('current_data2', current_data2);
+                						// console.log('current_data2', current_data2);
 										getKec(id_unit, current_data2.id_prov, current_data2.id_alamat).then(function(kec){
 											var data_alamat_kec = { 
 												action: 'singkron_alamat',
@@ -755,13 +755,13 @@ function singkron_master_cse(val){
 											    }
 											};
 											chrome.runtime.sendMessage(data_kec, function(response) {
-											    console.log('responeMessage', response);
+											    console.log(response,'Kecamatan untuk Kabupaten: '+id_unit+', '+current_data2.id_prov+', '+current_data2.id_alamat);
 											});
 											var last3 = data_kec_map.length-1;
 											data_kec_map.reduce(function(sequence3, nextData3){
 					                			return sequence3.then(function(current_data3){
 				                					return new Promise(function(resolve_reduce3, reject_reduce3){
-                										console.log('current_data3', current_data3);
+                										// console.log('current_data3', current_data3);
 														getKel(id_unit, current_data3.id_prov, current_data3.id_kab, current_data3.id_alamat).then(function(kel){
 															var data_alamat_kel = { 
 																action: 'singkron_alamat',
@@ -795,7 +795,7 @@ function singkron_master_cse(val){
 															    }
 															};
 															chrome.runtime.sendMessage(data_kel, function(response) {
-															    console.log('responeMessage', response);
+															    // console.log(response,'Desa/Kelurahan untuk Kecamatan: '+id_unit+', '+current_data3.id_prov+', '+current_data3.id_kab+', '+current_data3.id_alamat);
 															});
 															resolve_reduce3(nextData3);
 														});

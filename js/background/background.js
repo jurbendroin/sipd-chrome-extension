@@ -11,7 +11,7 @@ db.transaction(function (tx) {
 
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-	console.log('request', request);
+	// console.log('request', request);
 	var type = request.message.type;
 	if(type == 'actions'){
 		var actions = request.message.content.key;
@@ -43,18 +43,23 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			// 	debug: true
 			// });
 		});
+		response = "Complete actions "+actions;
+		sendResponse(response);
 	}else if(type == 'get-actions'){
 		getDB({
 			// debug: true
 		})
 		.then(function(ret){
-			console.log(type, ret);
+			// console.log(type, ret);
 			var options = {
 				type: 'response-actions',
 				data: ret
 			};
 			sendMessageTabActive(options);
 		});
+		response = "Complete get-actions";
+		sendResponse(response);
+
 	}else if(type == 'run-actions'){
 		var actions = request.message.content.key;
 		var data = request.message.content.data;
@@ -62,7 +67,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			key: actions,
 			data: data
 		};
-		console.log('run-actions', options)
+		// console.log('run-actions', options)
 		setDB(options)
 		.then(function(){
 			// getDB({
@@ -70,6 +75,8 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			// 	debug: true
 			// });
 		});
+		response = "Sukses run-actions "+actions;
+		sendResponse(response);
 	}else if(type == 'get-url'){
 		jQuery.ajax({
 		    url: request.message.content.url,
@@ -85,12 +92,14 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			     	sendMessageTabActive(options);
 			    }
 		        // console.log(ret, request.message.content);
-		        console.log(ret);
+			response = ret.message;
+			sendResponse(response);
 		    },
 		    error:function(){
-		        alert("Error");
+				response = "Complete "+request.message.content.data.action+" with error.";
+				sendResponse(response);
 		    }      
 		});
-	}
-	return sendResponse("THANKS from background!");
+	} else {sendResponse("THANKS from background!");}
+	return true;
 });

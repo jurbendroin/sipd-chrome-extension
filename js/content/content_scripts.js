@@ -17,7 +17,7 @@ var data = {
     }
 };
 chrome.runtime.sendMessage(data, function(response) {
-    console.log('responeMessage', response);
+    console.log('Cek respon background:', response);
 });
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		jQuery('#persen-loading').attr('total', '');
 		var res = request.data;
 		alert(res.message);
-		console.log(request.data);
+		// console.log(request.data);
 	}else if(request.type == 'response-actions'){
 		try {
 			var runjob = false;

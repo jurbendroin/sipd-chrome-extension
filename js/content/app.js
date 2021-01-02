@@ -547,7 +547,7 @@ jQuery(document).ready(function(){
 										jQuery('#persen-loading').attr('persen', c_persen);
 										jQuery('#persen-loading').html(((c_persen/units.data.length)*100).toFixed(2)+'%'+'<br>'+current_data.nama_skpd.nama_skpd);
 			                			singkron_rka_ke_lokal_all(current_data, function(){
-			                				console.log('next reduce', nextData);
+			                				console.log('Melanjutkan ke Unit berikutnya:', nextData.id_unit);
 											resolve_reduce(nextData);
 			                			});
 									})
@@ -1497,19 +1497,22 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 			    }
 			};
 			chrome.runtime.sendMessage(data, function(response) {
-			    console.log('responeMessage', response);
+			    console.log('Proses wp action set_unit_pagu: '+id_unit, response);
 			});
 		}
+		console.log('Memulai proses untuk unit:', id_unit);
 		jQuery.ajax({
 			url: config.sipd_url+'daerah/main/budget/belanja/'+config.tahun_anggaran+'/giat/tampil-giat/'+config.id_daerah+'/'+id_unit,
 			type: 'get',
 			success: function(subkeg){
 				var cat_wp = '';
 				var last = subkeg.data.length-1;
+				console.log('Sub kegiatan '+id_unit+' sebanyak',subkeg.data.length);
 				subkeg.data.reduce(function(sequence, nextData){
                     return sequence.then(function(current_data){
                 		return new Promise(function(resolve_reduce, reject_reduce){
                         	if(current_data.nama_sub_giat.mst_lock != 3 && current_data.kode_sub_skpd){
+					console.log('Memproses singkron_rka_ke_lokal untuk sub kegiatan', current_data.kode_sbl);
                         		cat_wp = current_data.kode_sub_skpd+' '+current_data.nama_sub_skpd;
                         		var nama_skpd = current_data.nama_skpd.split(' ');
                         		nama_skpd.shift();
@@ -1526,7 +1529,7 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 									pagu: current_data.pagu,
 									no_return: true
 								}, function(){
-									console.log('next reduce', nextData);
+									console.log('Selanjutnya akan memproses sub kegiatan:', nextData.kode_sbl);
 									resolve_reduce(nextData);
 								});
 							}else{
@@ -1564,7 +1567,7 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 						    }
 						};
 						chrome.runtime.sendMessage(data, function(response) {
-						    console.log('responeMessage', response);
+						    console.log('Selesai memproses sub kegiatan terakhir untuk '+id_unit, response);
 						});
 					}
                 })
@@ -1573,6 +1576,7 @@ function singkron_rka_ke_lokal_all(opsi_unit, callback) {
                 });
 			}
 		});
+		console.log('Selesai memproses untuk unit', id_unit);
 	}
 }
 
@@ -1900,7 +1904,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 													    }
 													};
 													chrome.runtime.sendMessage(data, function(response) {
-													    console.log('responeMessage', response);
+													    console.log('Proses wp action singkron_rka:', response);
 													    return resolve_reduce(nextData);
 													});
 									            })
@@ -1920,7 +1924,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 						                });
 						            }, Promise.resolve(_data_all[last]))
 						            .then(function(data_last){
-						            	console.log('opsi', opsi);
+						            	console.log('Selesai memproses singkron_rka_ke_lokal untuk sub kegiatan terakhir:', kode_sbl);
 										if(!opsi || !opsi.no_return){
 											alert('Berhasil Singkron RKA ke DB lokal!');
 											jQuery('#wrap-loading').hide();
