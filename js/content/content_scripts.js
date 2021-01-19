@@ -21,14 +21,17 @@ chrome.runtime.sendMessage(data, function(response) {
 });
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-	console.log('sender, request', sender, request);
+	//console.log('sender, request', sender, request);
 	if(request.type == 'response-fecth-url'){
 		jQuery('#wrap-loading').hide();
 		jQuery('#persen-loading').html('');
 		jQuery('#persen-loading').attr('persen', '');
 		jQuery('#persen-loading').attr('total', '');
 		var res = request.data;
-		alert(res.message);
+		swal('Sukses',res.message,{
+			icon: "success",
+			timer: 10000,
+		  });
 		// console.log(request.data);
 	}else if(request.type == 'response-actions'){
 		try {

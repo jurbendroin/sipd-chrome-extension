@@ -92,8 +92,8 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			     	sendMessageTabActive(options);
 			    }
 		        // console.log(ret, request.message.content);
-			response = ret.message;
-			sendResponse(response);
+				response = ret.message;
+				sendResponse(response);
 		    },
 		    error:function(){
 				response = "Complete "+request.message.content.data.action+" with error.";

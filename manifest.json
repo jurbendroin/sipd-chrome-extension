@@ -33,6 +33,9 @@
 			],
 			"js": [
 				"js/jquery.min.js",
+				"js/xlsx.core.min.js",
+				"js/xls.core.min.js",
+				"js/sweetalert.min.js",
 				"config.js",
 				"js/content/functions.js",
 				"js/content/content_scripts.js",

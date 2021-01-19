@@ -286,46 +286,60 @@ function getDetailPenerima(kode_sbl, rek, nomor_lampiran){
 function getDetailRin(id_unit, kode_sbl, idbelanjarinci, nomor_lampiran){
 	return new Promise(function(resolve, reject){
 		getToken().then(function(_token){
-			jQuery.ajax({
-				url: config.sipd_url+'daerah/main/budget/belanja/'+config.tahun_anggaran+'/rinci/cari-rincian/'+config.id_daerah+'/'+id_unit,
-				type: 'post',
-				data: "_token="+_token+'&kodesbl='+kode_sbl+'&idbelanjarinci='+idbelanjarinci,
-				success: function(rinci){
-					if(nomor_lampiran == 5){
-						getProv(id_unit).then(function(prov){
-							if(prov[rinci.id_prop_penerima]){
-								rinci.nama_prop = prov[rinci.id_prop_penerima].nama;
-								getKab(id_unit, rinci.id_prop_penerima).then(function(kab){
-									if(kab[rinci.id_kokab_penerima]){
-										rinci.nama_kab = kab[rinci.id_kokab_penerima].nama;
-										getKec(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima).then(function(kec){
-											if(kec[rinci.id_camat_penerima]){
-												rinci.nama_kec = kec[rinci.id_camat_penerima].nama;
-												getKel(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima, rinci.id_camat_penerima).then(function(kel){
-													if(kel[rinci.id_lurah_penerima]){
-														rinci.nama_kel = kel[rinci.id_lurah_penerima].nama;
-														return resolve(rinci);
-													}else{
-														return resolve(rinci);
-													}
-												});
-											}else{
-												return resolve(rinci);
-											}
-										});
-									}else{
-										return resolve(rinci);
-									}
-								});
-							}else{
-								return resolve(rinci);
-							}
-						});
-					}else{
-						return resolve(rinci);
+			(function runAjax(retries, delay){
+				delay = delay || 30000;
+				jQuery.ajax({
+					url: config.sipd_url+'daerah/main/budget/belanja/'+config.tahun_anggaran+'/rinci/cari-rincian/'+config.id_daerah+'/'+id_unit,
+					type: 'post',
+					timeout: 30000,
+					data: "_token="+_token+'&kodesbl='+kode_sbl+'&idbelanjarinci='+idbelanjarinci,
+					success: function(rinci){
+						if(nomor_lampiran == 5){
+							getProv(id_unit).then(function(prov){
+								if(prov[rinci.id_prop_penerima]){
+									rinci.nama_prop = prov[rinci.id_prop_penerima].nama;
+									getKab(id_unit, rinci.id_prop_penerima).then(function(kab){
+										if(kab[rinci.id_kokab_penerima]){
+											rinci.nama_kab = kab[rinci.id_kokab_penerima].nama;
+											getKec(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima).then(function(kec){
+												if(kec[rinci.id_camat_penerima]){
+													rinci.nama_kec = kec[rinci.id_camat_penerima].nama;
+													getKel(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima, rinci.id_camat_penerima).then(function(kel){
+														if(kel[rinci.id_lurah_penerima]){
+															rinci.nama_kel = kel[rinci.id_lurah_penerima].nama;
+															return resolve(rinci);
+														}else{
+															return resolve(rinci);
+														}
+													});
+												}else{
+													return resolve(rinci);
+												}
+											});
+										}else{
+											return resolve(rinci);
+										}
+									});
+								}else{
+									return resolve(rinci);
+								}
+							});
+						}else{
+							return resolve(rinci);
+						}
 					}
-				}
-			});
+				})
+				.fail(function(){
+					if (retries > 0 ) {
+						console.log('Koneksi error. Coba lagi',retries); // prrint retry count
+						setTimeout(function(){
+							runAjax(--retries);
+						},delay);
+					} else {
+						console.log('Koneksi error. Gagal mengambil data.');
+					}
+				})
+			})(20);
 		});
 	});
 }

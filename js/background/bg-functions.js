@@ -91,7 +91,7 @@ function rmDB(options){
 }
 
 function sendMessageAll(data, cb){
-    console.log('data', data);
+    console.log('sendMessageAll', data);
     chrome.runtime.sendMessage(data, function(response) {
         if(typeof cb == 'function'){
             cb(response);
@@ -100,7 +100,7 @@ function sendMessageAll(data, cb){
 }
 
 function sendMessageTabActive(data, cb){
-    console.log('data', data);
+    console.log('sendMessageTabActive', data);
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
             if(typeof cb == 'function'){
