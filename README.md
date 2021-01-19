@@ -2,6 +2,9 @@
 Optimasi aplikasi SIPD dengan chrome extension
 Semoga bermanfaat
 
+### Disponsori oleh:
+- https://www.instagram.com/lindodolan/ (BAJU ANAK MURAH MAGETAN)
+
 ### GRUP telegram https://t.me/sipd_chrome_extension
 
 ### Plugin Wordpress WP-SIPD https://github.com/agusnurwanto/wp-sipd
@@ -37,11 +40,14 @@ Semoga bermanfaat
 - Export data user anggota dewan ke database lokal
 - Menambahkan tombol detail akun/rekening di halaman analisa belanja > standar harga
 - Setting Nomor, tanggal dan keterangan Perkada
+- Perbaikan fitur import BANKEU (tambah kolom keterangan)
+- Import data RENSTRA
+- Import data Pendapatan
+- Import data Pembiayaan
 
 ### Pengembangan berikutnya:
 - Melengkapi dokumentasi penggunaan di halaman wiki
 - Melengkapi video tutorial di youtube
-- Import data RENSTRA
 
 ### Video tutorial
 - Cara install chrome extension https://www.youtube.com/watch?v=VnySS0RE6zc&t=318s

@@ -1412,3 +1412,198 @@ function singkron_pengaturan_sipd_lokal(){
 	    console.log('responeMessage', response);
 	});
 }
+
+function singkron_renstra_lokal(){
+	jQuery('#wrap-loading').show();
+	var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
+	jQuery.ajax({
+      	url: config.sipd_url+'daerah/main/budget/renstra/'+config.tahun_anggaran+'/tampil-renstra/'+config.id_daerah+'/'+id_unit+'?filter_program=&filter_indi_prog=&filter_giat=&filter_skpd=',
+      	type: "GET",
+      	contentType: 'application/json',
+      	success: function(rens){
+      		var data_renstra = [];
+      		rens.data.map(function(b, i){
+      			data_renstra[i] = {};
+      			data_renstra[i].id_bidang_urusan = b.id_bidang_urusan;
+				data_renstra[i].id_giat = b.id_giat;
+				data_renstra[i].id_program = b.id_program;
+				data_renstra[i].id_renstra = b.id_renstra;
+				data_renstra[i].id_rpjmd = b.id_rpjmd;
+				data_renstra[i].id_sub_giat = b.id_sub_giat;
+				data_renstra[i].id_unit = b.id_unit;
+				data_renstra[i].indikator = b.indikator;
+				data_renstra[i].indikator_sub = b.indikator_sub;
+				data_renstra[i].is_locked = b.is_locked;
+				data_renstra[i].kebijakan_teks = b.kebijakan_teks;
+				data_renstra[i].kode_bidang_urusan = b.kode_bidang_urusan;
+				data_renstra[i].kode_giat = b.kode_giat;
+				data_renstra[i].kode_program = b.kode_program;
+				data_renstra[i].kode_skpd = b.kode_skpd;
+				data_renstra[i].kode_sub_giat = b.kode_sub_giat;
+				data_renstra[i].misi_teks = b.misi_teks;
+				data_renstra[i].nama_bidang_urusan = b.nama_bidang_urusan;
+				data_renstra[i].nama_giat = b.nama_giat;
+				data_renstra[i].nama_program = b.nama_program;
+				data_renstra[i].nama_skpd = b.nama_skpd;
+				data_renstra[i].nama_sub_giat = b.nama_sub_giat;
+				data_renstra[i].outcome = b.outcome;
+				data_renstra[i].pagu_1 = b.pagu_1;
+				data_renstra[i].pagu_2 = b.pagu_2;
+				data_renstra[i].pagu_3 = b.pagu_3;
+				data_renstra[i].pagu_4 = b.pagu_4;
+				data_renstra[i].pagu_5 = b.pagu_5;
+				data_renstra[i].pagu_sub_1 = b.pagu_sub_1;
+				data_renstra[i].pagu_sub_2 = b.pagu_sub_2;
+				data_renstra[i].pagu_sub_3 = b.pagu_sub_3;
+				data_renstra[i].pagu_sub_4 = b.pagu_sub_4;
+				data_renstra[i].pagu_sub_5 = b.pagu_sub_5;
+				data_renstra[i].sasaran_teks = b.sasaran_teks;
+				data_renstra[i].satuan = b.satuan;
+				data_renstra[i].satuan_sub = b.satuan_sub;
+				data_renstra[i].strategi_teks = b.strategi_teks;
+				data_renstra[i].target_1 = b.target_1;
+				data_renstra[i].target_2 = b.target_2;
+				data_renstra[i].target_3 = b.target_3;
+				data_renstra[i].target_4 = b.target_4;
+				data_renstra[i].target_5 = b.target_5;
+				data_renstra[i].target_sub_1 = b.target_sub_1;
+				data_renstra[i].target_sub_2 = b.target_sub_2;
+				data_renstra[i].target_sub_3 = b.target_sub_3;
+				data_renstra[i].target_sub_4 = b.target_sub_4;
+				data_renstra[i].target_sub_5 = b.target_sub_5;
+				data_renstra[i].tujuan_teks = b.tujuan_teks;
+				data_renstra[i].visi_teks = b.visi_teks;
+			});
+			var data = {
+			    message:{
+			        type: "get-url",
+			        content: {
+		                url: config.url_server_lokal,
+		                type: 'post',
+		                data: { 
+		                    action: 'singkron_renstra',
+		                    tahun_anggaran: config.tahun_anggaran,
+		                    api_key: config.api_key,
+		                    data: data_renstra
+		                },
+		            	return: true
+		            }
+			    }
+			};
+			chrome.runtime.sendMessage(data, function(response) {
+			    console.log('responeMessage', response);
+			});
+      	}
+    });
+}
+
+function singkron_pendapatan_lokal(){
+	jQuery('#wrap-loading').show();
+	var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
+	jQuery.ajax({
+      	url: config.sipd_url+'daerah/main/budget/pendapatan/'+config.tahun_anggaran+'/ang/tampil-pendapatan/'+config.id_daerah+'/'+id_unit,
+      	type: "GET",
+      	contentType: 'application/json',
+      	success: function(data){
+      		var data_pendapatan = [];
+      		data.data.map(function(b, i){
+      			data_pendapatan[i] = {};
+      			data_pendapatan[i].created_user = b.created_user;
+				data_pendapatan[i].createddate = b.createddate;
+				data_pendapatan[i].createdtime = b.createdtime;
+				data_pendapatan[i].id_pendapatan = b.id_pendapatan;
+				data_pendapatan[i].keterangan = b.keterangan;
+				data_pendapatan[i].kode_akun = b.kode_akun;
+				data_pendapatan[i].nama_akun = b.nama_akun;
+				data_pendapatan[i].nilaimurni = b.nilaimurni;
+				data_pendapatan[i].program_koordinator = b.program_koordinator;
+				data_pendapatan[i].rekening = b.rekening;
+				data_pendapatan[i].skpd_koordinator = b.skpd_koordinator;
+				data_pendapatan[i].total = b.total;
+				data_pendapatan[i].updated_user = b.updated_user;
+				data_pendapatan[i].updateddate = b.updateddate;
+				data_pendapatan[i].updatedtime = b.updatedtime;
+				data_pendapatan[i].uraian = b.uraian;
+				data_pendapatan[i].urusan_koordinator = b.urusan_koordinator;
+				data_pendapatan[i].user1 = b.user1;
+				data_pendapatan[i].user2 = b.user2;
+			});
+			var data = {
+			    message:{
+			        type: "get-url",
+			        content: {
+		                url: config.url_server_lokal,
+		                type: 'post',
+		                data: { 
+		                    action: 'singkron_pendapatan',
+		                    tahun_anggaran: config.tahun_anggaran,
+		                    api_key: config.api_key,
+		                    data: data_pendapatan,
+		                    id_skpd: id_unit
+		                },
+		            	return: true
+		            }
+			    }
+			};
+			chrome.runtime.sendMessage(data, function(response) {
+			    console.log('responeMessage', response);
+			});
+      	}
+    });
+}
+
+function singkron_pembiayaan_lokal(type){
+	jQuery('#wrap-loading').show();
+	var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
+	jQuery.ajax({
+      	url: config.sipd_url+'daerah/main/budget/pembiayaan/'+config.tahun_anggaran+'/ang/'+type+'/tampil-pembiayaan/'+config.id_daerah+'/'+id_unit,
+      	type: "GET",
+      	contentType: 'application/json',
+      	success: function(data){
+      		var data_pembiayaan = [];
+      		data.data.map(function(b, i){
+      			data_pembiayaan[i] = {};
+      			data_pembiayaan[i].created_user = b.created_user;
+				data_pembiayaan[i].createddate = b.createddate;
+				data_pembiayaan[i].createdtime = b.createdtime;
+				data_pembiayaan[i].id_pembiayaan = b.id_pembiayaan;
+				data_pembiayaan[i].keterangan = b.keterangan;
+				data_pembiayaan[i].kode_akun = b.kode_akun;
+				data_pembiayaan[i].nama_akun = b.nama_akun;
+				data_pembiayaan[i].nilaimurni = b.nilaimurni;
+				data_pembiayaan[i].program_koordinator = b.program_koordinator;
+				data_pembiayaan[i].rekening = b.rekening;
+				data_pembiayaan[i].skpd_koordinator = b.skpd_koordinator;
+				data_pembiayaan[i].total = b.total;
+				data_pembiayaan[i].updated_user = b.updated_user;
+				data_pembiayaan[i].updateddate = b.updateddate;
+				data_pembiayaan[i].updatedtime = b.updatedtime;
+				data_pembiayaan[i].uraian = b.uraian;
+				data_pembiayaan[i].urusan_koordinator = b.urusan_koordinator;
+				data_pembiayaan[i].type = type;
+				data_pembiayaan[i].user1 = b.user1;
+				data_pembiayaan[i].user2 = b.user2;
+			});
+			var data = {
+			    message:{
+			        type: "get-url",
+			        content: {
+		                url: config.url_server_lokal,
+		                type: 'post',
+		                data: { 
+		                    action: 'singkron_pembiayaan',
+		                    tahun_anggaran: config.tahun_anggaran,
+		                    api_key: config.api_key,
+		                    data: data_pembiayaan,
+		                    id_skpd: id_unit
+		                },
+		            	return: true
+		            }
+			    }
+			};
+			chrome.runtime.sendMessage(data, function(response) {
+			    console.log('responeMessage', response);
+			});
+      	}
+    });
+}

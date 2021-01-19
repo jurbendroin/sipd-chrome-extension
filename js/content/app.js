@@ -51,7 +51,9 @@ jQuery(document).ready(function(){
 	        +'<div class="lds-hourglass"></div>'
 	        +'<div id="persen-loading"></div>'
 	    +'</div>';
-	jQuery('body').prepend(loading);
+	if(jQuery('#wrap-loading').length == 0){
+		jQuery('body').prepend(loading);
+	}
 	var current_url = window.location.href;
 
 	 // halaman SSH
@@ -1316,7 +1318,53 @@ jQuery(document).ready(function(){
 	        jQuery('#wrap-loading').show();
 	        singkron_pengaturan_sipd_lokal();
 		});
-
+	 }else if(current_url.indexOf('/renstra/'+config.tahun_anggaran+'/list/'+config.id_daerah+'/') != -1){
+		console.log('halaman RENSTRA');
+		var singkron_lokal = ''
+            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-renstra-lokal" style="margin-left: 30px;">'
+                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
+            +'</button>';
+		jQuery('#reset_program').after(singkron_lokal);
+		jQuery('#singkron-renstra-lokal').on('click', function(){
+	        jQuery('#wrap-loading').show();
+	        singkron_renstra_lokal();
+		});
+	 }else if(
+	 	current_url.indexOf('/pendapatan/'+config.tahun_anggaran+'/ang/unit/'+config.id_daerah+'/') != -1
+	 	|| current_url.indexOf('/pendapatan/'+config.tahun_anggaran+'/ang/list/'+config.id_daerah+'/') != -1
+	 ){
+		console.log('halaman RKA pendapatan');
+		var singkron_lokal = ''
+	        +'<div class="col-xs-9">'
+	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pendapatan-lokal" style="margin-left: 30px;">'
+	                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
+	            +'</button>'
+	        +'</div>';
+		jQuery('.m-t-0').append(singkron_lokal);
+		jQuery('#singkron-pendapatan-lokal').on('click', function(){
+	        jQuery('#wrap-loading').show();
+	        singkron_pendapatan_lokal();
+		});
+	}else if(
+	 	current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1
+	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/unit/'+config.id_daerah+'/') != -1
+	){
+		console.log('halaman RKA pembiayaan');
+		var singkron_lokal = ''
+	        +'<div class="col-xs-9">'
+	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pembiayaan-lokal" style="margin-left: 30px;">'
+	                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
+	            +'</button>'
+	        +'</div>';
+		jQuery('.m-t-0').append(singkron_lokal);
+		jQuery('#singkron-pembiayaan-lokal').on('click', function(){
+	        jQuery('#wrap-loading').show();
+	        var type = 'pengeluaran';
+	        if(current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1){
+	        	type = 'penerimaan';
+	        }
+	        singkron_pembiayaan_lokal(type);
+		});
 	}
 });
 
@@ -1898,7 +1946,14 @@ function singkron_rka_ke_lokal(opsi, callback) {
 													data_rka.dataOutputGiat[i].targetoutputteks = d.targetoutputteks;
 												});
 												subkeg.dataLokout.map(function(d, i){
-
+													data_rka.dataLokout[i] = {};
+													data_rka.dataLokout[i].camatteks = d.camatteks;
+													data_rka.dataLokout[i].daerahteks = d.daerahteks;
+													data_rka.dataLokout[i].idcamat = d.idcamat;
+													data_rka.dataLokout[i].iddetillokasi = d.iddetillokasi;
+													data_rka.dataLokout[i].idkabkota = d.idkabkota;
+													data_rka.dataLokout[i].idlurah = d.idlurah;
+													data_rka.dataLokout[i].lurahteks = d.lurahteks;
 												});
 												subkeg.dataOutput.map(function(d, i){
 													data_rka.dataOutput[i] = {};
@@ -1909,7 +1964,11 @@ function singkron_rka_ke_lokal(opsi, callback) {
 													data_rka.dataOutput[i].targetoutputteks = d.targetoutputteks;
 												});
 												subkeg.dataHasil.map(function(d, i){
-
+													data_rka.dataHasil[i] = {};
+													data_rka.dataHasil[i].hasilteks = d.hasilteks;
+													data_rka.dataHasil[i].satuanhasil = d.satuanhasil;
+													data_rka.dataHasil[i].targethasil = d.targethasil;
+													data_rka.dataHasil[i].targethasilteks = d.targethasilteks;
 												});
 												subkeg.dataEs3.map(function(d, i){
 
@@ -1930,6 +1989,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 													data_rka.dataDana[i].kodedana = d.kodedana;
 													data_rka.dataDana[i].iddana = d.iddana;
 													data_rka.dataDana[i].iddanasubbl = d.iddanasubbl;
+													data_rka.dataDana[i].pagudana = d.pagudana;
 												});
 												subkeg.dataBl.map(function(d, i){
 													data_rka.dataBl[i] = {};
@@ -2057,7 +2117,6 @@ function singkron_rka_ke_lokal(opsi, callback) {
 												if(_data.length > 0){
 													_data_all.push(_data);
 												}
-
 												var no_excel = 0;
 												var last = _data_all.length-1;
 												_data_all.reduce(function(sequence, nextData){
@@ -2126,6 +2185,9 @@ function singkron_rka_ke_lokal(opsi, callback) {
 																		}
 																	}
 																};
+																if(!opsi || !opsi.no_return){
+																	data.message.content.return = true;
+																}			
 																chrome.runtime.sendMessage(data, function(response) {
 																	console.log('Proses wp action singkron_rka:', response);
 																	return resolve_reduce(nextData);
@@ -2148,11 +2210,11 @@ function singkron_rka_ke_lokal(opsi, callback) {
 												}, Promise.resolve(_data_all[last]))
 												.then(function(){
 													//console.log('Selesai memproses singkron_rka_ke_lokal untuk sub kegiatan:', kode_sbl);
-													if(!opsi || !opsi.no_return){
-														sweetAlert('Berhasil Singkron RKA ke DB lokal!');
-														jQuery('#wrap-loading').hide();
-														jQuery('#download_data_excel').show();
-													}
+													// if(!opsi || !opsi.no_return){
+													// 	sweetAlert('Berhasil Singkron RKA ke DB lokal!');
+													// 	jQuery('#wrap-loading').hide();
+													// 	jQuery('#download_data_excel').show();
+													// }
 													if(callback){
 														callback();
 													}
