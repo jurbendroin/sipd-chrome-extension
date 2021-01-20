@@ -1648,7 +1648,7 @@ function singkron_skpd_ke_lokal(){
 
 async function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 	if((opsi_unit && opsi_unit.id_skpd) || confirm('Apakah anda yakin melakukan ini? data lama akan diupdate dengan data terbaru.')){
-		jQuery('#wrap-loading').show();
+		if (!opsi_unit) jQuery('#wrap-loading').show();
 		var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
 		//var tahun_anggaran = window.location.href.split('/')[7];
 		if(opsi_unit && opsi_unit.id_skpd){
@@ -1755,6 +1755,27 @@ async function singkron_rka_ke_lokal_all(opsi_unit, callback) {
 										jQuery('#persen-loading').attr('total', c_total);
 										jQuery('#persen-loading').attr('progress', c_progress);
 										jQuery('#persen-loading').html((((c_progress)/c_total)*100).toFixed(2)+'%'+'<br>');
+										if (c_progress == c_total) {
+											var opsi = { 
+												action: 'get_cat_url',
+												api_key: config.api_key,
+												category : cat_wp
+											};
+											var data = {
+												message:{
+													type: "get-url",
+													content: {
+														url: config.url_server_lokal,
+														type: 'post',
+														data: opsi,
+														return: true
+													}
+												}
+											};
+											chrome.runtime.sendMessage(data, function(response) {
+												console.log('Selesai memproses sub kegiatan terakhir.', response);
+											});
+										}
 										//console.log('Selanjutnya akan memproses sub kegiatan:', nextData.kode_sbl);
 										resolve_reduce(nextData);
 									});
@@ -2079,18 +2100,20 @@ function singkron_rka_ke_lokal(opsi, callback) {
 													}
 													if(rka.satuan){
 														_rka.satuan = rka.satuan;
-													}else{
-														_rka.satuan = '';
+													}else if (rka.koefisien) {
+														_rka.satuan = rka.koefisien.split(' ');
+														_rka.satuan.shift();
+														_rka.satuan = _rka.satuan.join(' ');
 													}
-													_rka.sat1 = rka.sat1;
-													_rka.sat2 = rka.sat2;
-													_rka.sat3 = rka.sat3;
-													_rka.sat4 = rka.sat4;
+													_rka.sat1 = rka.sat_1;
+													_rka.sat2 = rka.sat_2;
+													_rka.sat3 = rka.sat_3;
+													_rka.sat4 = rka.sat_4;
 													_rka.spek = rka.spek;
-													_rka.volum1 = rka.volum1;
-													_rka.volum2 = rka.volum2;
-													_rka.volum3 = rka.volum3;
-													_rka.volum4 = rka.volum4;
+													_rka.volum1 = rka.vol_1;
+													_rka.volum2 = rka.vol_2;
+													_rka.volum3 = rka.vol_3;
+													_rka.volum4 = rka.vol_4;
 													_rka.subs_bl_teks = rka.subs_bl_teks;
 													_rka.total_harga = rka.rincian;
 													_rka.rincian = rka.rincian;
