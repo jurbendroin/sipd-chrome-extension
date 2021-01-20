@@ -11,8 +11,8 @@ db.transaction(function (tx) {
 
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-	// console.log('request', request);
 	var type = request.message.type;
+	var tab_id = sender.tab.id;
 	if(type == 'actions'){
 		var actions = request.message.content.key;
 		var proses = [];
@@ -53,6 +53,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 			// console.log(type, ret);
 			var options = {
 				type: 'response-actions',
+				tab: tab_id,
 				data: ret
 			};
 			sendMessageTabActive(options);
@@ -87,6 +88,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		    	if(request.message.content.return){
 			     	var options = {
 			     		type: 'response-fecth-url',
+						tab: tab_id,
 			     		data: ret
 			     	}
 			     	sendMessageTabActive(options);

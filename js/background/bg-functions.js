@@ -100,9 +100,8 @@ function sendMessageAll(data, cb){
 }
 
 function sendMessageTabActive(data, cb){
-    console.log('sendMessageTabActive', data);
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
+        chrome.tabs.sendMessage(data.tab, data, function(response) {
             if(typeof cb == 'function'){
                 cb(response);
             }
