@@ -1872,10 +1872,10 @@ function singkron_rka_ke_lokal(opsi, callback) {
 					script = script[1].split("'");
 					kode_sbl = script[0];
 					var _kode_bl = kode_sbl.split('.');
+					idbl = _kode_bl[2];
+					idsubbl = _kode_bl[3];
 					_kode_bl.pop();
 					kode_bl = _kode_bl.join('.');
-					// idbl = script[0];
-					// idsubbl = script[1];
 				}
 			});
 		}else{
@@ -1883,8 +1883,14 @@ function singkron_rka_ke_lokal(opsi, callback) {
 			id_sub_skpd = opsi.id_sub_skpd;
 			kode_bl = opsi.kode_bl;
 			kode_sbl = opsi.kode_sbl;
-			idbl = opsi.idbl;
-			idsubbl = opsi.idsubbl;
+			if (idsubbl) {
+				idbl = opsi.idbl;
+				idsubbl = opsi.idsubbl;
+			} else {
+				_kode_sbl = kode_sbl.split('.');
+				idbl = _kode_sbl[2];
+				idsubbl = _kode_sbl[3];
+			}
 			kode_skpd = opsi.kode_skpd;
 			nama_skpd = opsi.nama_skpd;
 			kode_sub_skpd = opsi.kode_sub_skpd;
