@@ -27,10 +27,15 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		jQuery('#persen-loading').attr('persen', '');
 		jQuery('#persen-loading').attr('total', '');
 		var res = request.data;
-		swal(res.status,res.message,{
+		var message = res.message;
+		if (res.simda_status) message += '\nStatus Singkron Simda: '+res.simda_status;
+		if (res.simda_msg) message += '\nPesan Singkron Simda: '+res.simda_msg;
+		swal({
+			title: res.status,
+			text: message,
 			icon: res.status,
 			//timer: 10000,
-		  });
+		});
 		// console.log(request.data);
 	}else if(request.type == 'response-actions'){
 		try {
