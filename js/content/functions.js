@@ -1496,10 +1496,31 @@ function singkron_renstra_lokal(){
       	}
     });
 }
+function singkron_pendapatan_lokal_all_unit(){
+	(function runAjax(retries, delay){
+		delay = delay || 30000;
+		jQuery.ajax({
+			url: config.sipd_url+'daerah/main/budget/pendapatan/'+config.tahun_anggaran+'/ang/tampil-unit/'+config.id_daerah+'/0',
+			type: 'get',
+			timeout: 30000,
+			success: function(unit){
+				jQuery('#persen-loading').attr('total', unit.data.length);
+				jQuery('#persen-loading').attr('progress', 0);
+				unit.data.map(function(d,i){
+					singkron_pendapatan_lokal(d.id_skpd,false)
+				})
+			}
+		})
+		.fail(function(){
+			console.log('Koneksi error. Coba lagi'+retries); // prrint retry count
+			retries > 0 && setTimeout(function(){
+				runAjax(--retries);
+			},delay);
+		})
+	})(20);
+}
 
-function singkron_pendapatan_lokal(){
-	jQuery('#wrap-loading').show();
-	var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
+function singkron_pendapatan_lokal(id_unit,rtn=true){
 	jQuery.ajax({
       	url: config.sipd_url+'daerah/main/budget/pendapatan/'+config.tahun_anggaran+'/ang/tampil-pendapatan/'+config.id_daerah+'/'+id_unit,
       	type: "GET",
@@ -1541,20 +1562,53 @@ function singkron_pendapatan_lokal(){
 		                    data: data_pendapatan,
 		                    id_skpd: id_unit
 		                },
-		            	return: true
+		            	return: rtn
 		            }
 			    }
 			};
 			chrome.runtime.sendMessage(data, function(response) {
 			    console.log('responeMessage', response);
+				var c_total = +jQuery('#persen-loading').attr('total');
+				var c_progress = +jQuery('#persen-loading').attr('progress')+1;
+				jQuery('#persen-loading').attr('total', c_total);
+				jQuery('#persen-loading').attr('progress', c_progress);
+				jQuery('#persen-loading').html((((c_progress)/c_total)*100).toFixed(2)+'%'+'<br>');
+				if (c_progress == c_total & !rtn) {
+					jQuery('#wrap-loading').hide();
+					sweetAlert('Success','Selesai','success');
+				}
 			});
       	}
     });
 }
 
-function singkron_pembiayaan_lokal(type){
+function singkron_pembiayaan_lokal_all(type){
+	(function runAjax(retries, delay){
+		delay = delay || 30000;
+		jQuery.ajax({
+			url: config.sipd_url+'daerah/main/budget/pembiayaan/'+config.tahun_anggaran+'/ang/'+type+'/tampil-unit/'+config.id_daerah+'/0',
+			type: 'get',
+			timeout: 30000,
+			success: function(unit){
+				jQuery('#persen-loading').attr('total', unit.data.length);
+				jQuery('#persen-loading').attr('progress', 0);
+				unit.data.map(function(d,i){
+					singkron_pembiayaan_lokal(type,d.id_skpd,false)
+				})
+			}
+		})
+		.fail(function(){
+			console.log('Koneksi error. Coba lagi'+retries); // prrint retry count
+			retries > 0 && setTimeout(function(){
+				runAjax(--retries);
+			},delay);
+		})
+	})(20);
+}
+
+function singkron_pembiayaan_lokal(type,id_unit,rtn=true){
 	jQuery('#wrap-loading').show();
-	var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
+	// var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
 	jQuery.ajax({
       	url: config.sipd_url+'daerah/main/budget/pembiayaan/'+config.tahun_anggaran+'/ang/'+type+'/tampil-pembiayaan/'+config.id_daerah+'/'+id_unit,
       	type: "GET",
@@ -1597,12 +1651,22 @@ function singkron_pembiayaan_lokal(type){
 		                    data: data_pembiayaan,
 		                    id_skpd: id_unit
 		                },
-		            	return: true
+		            	return: rtn
 		            }
 			    }
 			};
 			chrome.runtime.sendMessage(data, function(response) {
 			    console.log('responeMessage', response);
+				var c_total = +jQuery('#persen-loading').attr('total');
+				var c_progress = +jQuery('#persen-loading').attr('progress')+1;
+				jQuery('#persen-loading').attr('total', c_total);
+				jQuery('#persen-loading').attr('progress', c_progress);
+				jQuery('#persen-loading').html((((c_progress)/c_total)*100).toFixed(2)+'%'+'<br>');
+				if (c_progress == c_total & !rtn) {
+					jQuery('#wrap-loading').hide();
+					sweetAlert('Success','Selesai','success');
+				}
+
 			});
       	}
     });

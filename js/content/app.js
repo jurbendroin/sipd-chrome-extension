@@ -1350,35 +1350,45 @@ jQuery(document).ready(function(){
 	 ){
 		console.log('halaman RKA pendapatan');
 		var singkron_lokal = ''
-	        +'<div class="col-xs-9">'
-	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pendapatan-lokal" style="margin-left: 30px;">'
+	        +'<div>'
+	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pendapatan-lokal" style="margin-left: 0px;">'
 	                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
 	            +'</button>'
 	        +'</div>';
-		jQuery('.m-t-0').append(singkron_lokal);
+		jQuery('.white-box').prepend(singkron_lokal);
 		jQuery('#singkron-pendapatan-lokal').on('click', function(){
-	        jQuery('#wrap-loading').show();
-	        singkron_pendapatan_lokal();
+			jQuery('#wrap-loading').show();
+			jQuery('#persen-loading').attr('total', 1);
+			jQuery('#persen-loading').html('0%');
+			var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
+			if (id_unit == 0) singkron_pendapatan_lokal_all_unit() 
+			else {singkron_pendapatan_lokal(id_unit);}
 		});
 	}else if(
 	 	current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1
-	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/unit/'+config.id_daerah+'/') != -1
+		 || current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/unit/'+config.id_daerah+'/') != -1
+		 || current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/list/'+config.id_daerah+'/') != -1
+		 || current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/list/'+config.id_daerah+'/') != -1
 	){
 		console.log('halaman RKA pembiayaan');
 		var singkron_lokal = ''
-	        +'<div class="col-xs-9">'
-	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pembiayaan-lokal" style="margin-left: 30px;">'
+	        +'<div>'
+	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pembiayaan-lokal" style="margin-left: 0px;">'
 	                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
 	            +'</button>'
 	        +'</div>';
-		jQuery('.m-t-0').append(singkron_lokal);
+		jQuery('.white-box').prepend(singkron_lokal);
 		jQuery('#singkron-pembiayaan-lokal').on('click', function(){
+			var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
 	        jQuery('#wrap-loading').show();
+			jQuery('#persen-loading').attr('total', 1);
+			jQuery('#persen-loading').html('0%');
 	        var type = 'pengeluaran';
 	        if(current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1){
 	        	type = 'penerimaan';
 	        }
-	        singkron_pembiayaan_lokal(type);
+	       if (id_unit == 0) singkron_pembiayaan_lokal_all(type)
+	       else singkron_pembiayaan_lokal(type,id_unit);
 		});
 	}
 });
