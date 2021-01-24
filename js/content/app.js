@@ -343,7 +343,7 @@ jQuery(document).ready(function(){
 								jQuery('#persen-loading').html('');
 								jQuery('#persen-loading').attr('persen', '');
 								jQuery('#persen-loading').attr('total', '');
-								alert('Data berhasil disimpan di database lokal!');
+								sweetAlert('Data berhasil disimpan di database lokal!');
 							})
 							.catch(function(e){
 								console.log(e);
@@ -1471,8 +1471,8 @@ function singkron_skpd_ke_lokal(){
 		(function runAjax(retries, delay){
 			delay = delay || 30000;
 			jQuery.ajax({
-				url: config.sipd_url+'daerah/main/plan/belanja/'+config.tahun_anggaran+'/giat/tampil-unit/'+config.id_daerah+'/0',
-				//url: config.sipd_url+'daerah/main/budget/belanja/'+config.tahun_anggaran+'/giat/tampil-unit/'+config.id_daerah+'/0',
+				//url: config.sipd_url+'daerah/main/plan/belanja/'+config.tahun_anggaran+'/giat/tampil-unit/'+config.id_daerah+'/0',
+				url: config.sipd_url+'daerah/main/budget/belanja/'+config.tahun_anggaran+'/giat/tampil-unit/'+config.id_daerah+'/0',
 				type: 'get',
 				timeout: 30000,
 				success: function(units){
