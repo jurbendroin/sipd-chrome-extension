@@ -1366,9 +1366,9 @@ jQuery(document).ready(function(){
 		});
 	}else if(
 	 	current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1
-		 || current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/unit/'+config.id_daerah+'/') != -1
-		 || current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/list/'+config.id_daerah+'/') != -1
-		 || current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/list/'+config.id_daerah+'/') != -1
+	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/unit/'+config.id_daerah+'/') != -1
+	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/list/'+config.id_daerah+'/') != -1
+	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/list/'+config.id_daerah+'/') != -1
 	){
 		console.log('halaman RKA pembiayaan');
 		var singkron_lokal = ''
@@ -1384,7 +1384,10 @@ jQuery(document).ready(function(){
 			jQuery('#persen-loading').attr('total', 1);
 			jQuery('#persen-loading').html('0%');
 	        var type = 'pengeluaran';
-	        if(current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1){
+	        if(
+	        	current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1
+	        	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/list/'+config.id_daerah+'/') != -1
+	        ){
 	        	type = 'penerimaan';
 	        }
 	       if (id_unit == 0) singkron_pembiayaan_lokal_all(type)
