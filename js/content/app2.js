@@ -217,11 +217,13 @@ jQuery(document).ready(function () {
         }
 	} else if ((current_url.indexOf('/main/plan/reses/') != -1)||(current_url.indexOf('/main/plan/asmas/') != -1)) { //Usulan Masyarakat ataupun Reses / Pokok Pikiran
 		var ta = window.location.href.split('/')[7];
-        var singkron_data_usulan = ''
+		var singkron_data_usulan = ''
+			+ '<div class="pull-right p-t-10 m-b-20">'
             + '<button class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron_data_usulan_lokal">'
             + '<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron Usulan ke DB lokal</span>'
-            + '</button>';
-        jQuery('#tab-bar-usul-tolak').parent().append(singkron_data_usulan);
+			+ '</button>'
+			+ '</div>';
+        jQuery('.panel-heading').append(singkron_data_usulan);
 
         jQuery('#singkron_data_usulan_lokal').on('click', function () {
 			if (current_url.indexOf('/main/plan/reses/') != -1) {
@@ -237,6 +239,8 @@ jQuery(document).ready(function () {
 				proses_data_usulan(jenis,'verif_mitra',ta);
 				proses_data_usulan(jenis,'verif_tapd',ta);
 				proses_data_usulan(jenis,'monitor',ta);
+				proses_data_usulan(jenis,'tolak',ta);
+				proses_data_usulan(jenis,'',ta);
 				jQuery('#wrap-loading').hide();
             }
         }
@@ -253,139 +257,305 @@ jQuery(document).ready(function () {
         jQuery('#impor_kamus').on('click', function () {
 			imporKamus(jenis);
         });
+	} else if (current_url.indexOf('/main/budget/rekap/' + config.tahun_anggaran + '/belanja/') != -1) { 
+		var ta = window.location.href.split('/')[7];
+		var html_impor_rekap = ''
+			+ '<input type="button" id="impor_rekap" value="Impor Rekap ke Lokal" />';
+		jQuery('.white-box').prepend(html_impor_rekap);
+        jQuery('#impor_rekap').on('click', function () {
+			imporRekap(ta,18);
+        });
 	}
 })
-function proses_data_usulan (jenis,level,ta) {
+function proses_data_usulan (jenis,level,ta,callback) {
 	if (level == 'verif_mitra') {
 		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-verif-usulan/' + config.id_daerah + '/0?verif_skpd=0&valid_tapd=0';
 	} else if (level == 'verif_tapd') {
 		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-verif-usulan/' + config.id_daerah + '/0?verif_skpd=0&valid_tapd=1';
 	} else if (level == 'monitor') {
 		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-monitor/' + config.id_daerah + '/0';
-	}
+	} else if (level == 'tolak') {
+		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-usul-tolak/' + config.id_daerah + '/0';
+	} else var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-usulan/' + config.id_daerah + '/0';
+	// jQuery('#wrap-loading').show();
+	// jQuery('#persen-loading').attr('persen', 0);
+	// jQuery('#persen-loading').html('0%');
 	(function runAjax(retries, delay){
 		delay = delay || 30000;
 		jQuery.ajax({
 			url: url,
-			timeout: 30000,
+			timeout: 180000,
 			contentType: 'application/json',
 			success: function (data) {
-				var data_usulan = data.data.map(async function (usulan, i) {
-					if (jenis === 'reses') {
-						var id_usulan = data.data[i].id_reses;
-					} else {
-						var id_usulan = data.data[i].id_usulan;
-					}
-					try {
-						return new Promise(function (resolve, reject) {
-							(function runAjax1(retries, delay) {
-								delay = delay || 30000;
-								jQuery.ajax({
-									url: config.sipd_url + 'daerah/main/plan/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
-									type: "post",
-									timeout: 30000,
-									data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
-									success: function (rinciusulan_) {
-										data_usulan_ = usulan;
-										jQuery.extend(data_usulan_, rinciusulan_);
-										delete (data_usulan_.id_usulan);
-										delete (data_usulan_.id_reses);
-										delete (data_usulan_.rekom_camat);
-										delete (data_usulan_.rekom_setwan);
-										delete (data_usulan_.rekom_lurah);
-										delete (data_usulan_.rekom_desa);
-										delete (data_usulan_.rekom_mitra);
-										delete (data_usulan_.rekom_skpd);
-										delete (data_usulan_.rekom_tapd);
-										delete (data_usulan_.rekom_camat);
-										delete (data_usulan_.setPilih);
-										if (jenis === 'reses') data_usulan_.id_reses = id_usulan;
-										if (jenis === 'asmas') data_usulan_.id_usulan = id_usulan;
-										if (level === 'verif_mitra') {
-											data_usulan_.verif_skpd = 0;
-											data_usulan_.valid_tapd = 0;
-										} else if (level === 'verif_tapd') {
-											data_usulan_.verif_skpd = 0;
-											data_usulan_.valid_tapd = 1;
-										}
-										if (usulan.rekom_camat) {
-											data_usulan_.rekom_camat_rekomendasi = usulan.rekom_camat.rekomendasi;
-											data_usulan_.rekom_camat_koefisien = usulan.rekom_camat.koefisien;
-											data_usulan_.rekom_camat_anggaran = usulan.rekom_camat.anggaran;
-										}
-										if (usulan.rekom_setwan) {
-											data_usulan_.rekom_setwan_rekomendasi = usulan.rekom_setwan.rekomendasi;
-											data_usulan_.rekom_setwan_koefisien = usulan.rekom_setwan.koefisien;
-											data_usulan_.rekom_setwan_anggaran = usulan.rekom_setwan.anggaran;
-										}
-										if (usulan.rekom_lurah) {
-											data_usulan_.rekom_lurah_rekomendasi = usulan.rekom_lurah.rekomendasi;
-											data_usulan_.rekom_lurah_koefisien = usulan.rekom_lurah.koefisien;
-											data_usulan_.rekom_lurah_anggaran = usulan.rekom_lurah.anggaran;
-										}
-										if (usulan.rekom_mitra) {
-											data_usulan_.rekom_mitra_rekomendasi = usulan.rekom_mitra.rekomendasi;
-											data_usulan_.rekom_mitra_koefisien = usulan.rekom_mitra.koefisien;
-											data_usulan_.rekom_mitra_anggaran = usulan.rekom_mitra.anggaran;
-										}
-										if (usulan.rekom_skpd) {
-											data_usulan_.rekom_skpd_rekomendasi = usulan.rekom_skpd.rekomendasi;
-											data_usulan_.rekom_skpd_koefisien = usulan.rekom_skpd.koefisien;
-											data_usulan_.rekom_skpd_anggaran = usulan.rekom_skpd.anggaran;
-										}
-										if (usulan.rekom_tapd) {
-											data_usulan_.rekom_tapd_rekomendasi = usulan.rekom_tapd.rekomendasi;
-											data_usulan_.rekom_tapd_koefisien = usulan.rekom_tapd.koefisien;
-											data_usulan_.rekom_tapd_anggaran = usulan.rekom_tapd.anggaran;
-										}
-										return resolve(data_usulan_);
-									}
-								})
-								.fail(function () {
-									console.log('Koneksi error. Coba lagi' + retries); // prrint retry count
-									retries > 0 && setTimeout(function () {
-										runAjax1(--retries);
-									}, delay);
-								});
-							})(20);
-						});
-					} catch (e) {
-						console.log(e);
-						return await Promise.resolve({});
+				var data_all = [];
+				var data_sementara = [];
+				console.log(data.data.length);
+				data.data.map(function(b, i){
+					//console.log(i);
+					data_sementara.push(b);
+					var n = i+1;
+					if(n%50 == 0 || n == data.data.length){
+						console.log(n);
+						data_all.push(data_sementara);
+						data_sementara = [];
 					}
 				});
-				Promise.all(data_usulan)
-				.then(function(all_usulan){
-					var opsi = {
-						action: 'singkron_data_usulan',
-						tahun_anggaran: ta,
-						jenis: jenis,
-						api_key: config.api_key,
-						data_usulan: all_usulan
-					};
-					var data = {
-						message:{
-			
-							type: "get-url",
-							content: {
-								url: config.url_server_lokal,
-								type: 'post',
-								data: opsi,
-								return: false
-							}
-						}
-					};
-					console.log('All Usulan',all_usulan);
-					if (all_usulan.length > 0) {
-						chrome.runtime.sendMessage(data, function(response) {
-							console.log('responeMessage', response);
+
+				var i = 0;
+				var last = data_all.length-1;
+				data_all.reduce(function(sequence, nextData){
+					return sequence.then(function(current_data){
+						return new Promise(function(resolve_redurce, reject_redurce){
+							var sendData = current_data.map(function(usulan, n){
+								return new Promise(function(resolve, reject){
+									if (jenis === 'reses') {
+										var id_usulan = usulan.id_reses;
+									} else {
+										var id_usulan = usulan.id_usulan;
+									}	
+									(function runAjax1(retries, delay) {
+										delay = delay || 30000;
+										jQuery.ajax({
+											url: config.sipd_url + 'daerah/main/plan/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
+											type: "post",
+											timeout: 30000,
+											data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
+											success: function (rinciusulan_) {
+												data_usulan_ = usulan;
+												jQuery.extend(data_usulan_, rinciusulan_);
+												delete (data_usulan_.id_usulan);
+												delete (data_usulan_.id_reses);
+												delete (data_usulan_.rekom_camat);
+												delete (data_usulan_.rekom_setwan);
+												delete (data_usulan_.rekom_lurah);
+												delete (data_usulan_.rekom_desa);
+												delete (data_usulan_.rekom_mitra);
+												delete (data_usulan_.rekom_skpd);
+												delete (data_usulan_.rekom_tapd);
+												delete (data_usulan_.rekom_camat);
+												delete (data_usulan_.setPilih);
+												if (jenis === 'reses') data_usulan_.id_reses = id_usulan;
+												if (jenis === 'asmas') data_usulan_.id_usulan = id_usulan;
+												if (level === 'verif_mitra') {
+													data_usulan_.verif_skpd = 0;
+													data_usulan_.valid_tapd = 0;
+												} else if (level === 'verif_tapd') {
+													data_usulan_.verif_skpd = 0;
+													data_usulan_.valid_tapd = 1;
+												}
+												if (usulan.rekom_camat) {
+													data_usulan_.rekom_camat_rekomendasi = usulan.rekom_camat.rekomendasi;
+													data_usulan_.rekom_camat_koefisien = usulan.rekom_camat.koefisien;
+													data_usulan_.rekom_camat_anggaran = usulan.rekom_camat.anggaran;
+												}
+												if (usulan.rekom_setwan) {
+													data_usulan_.rekom_setwan_rekomendasi = usulan.rekom_setwan.rekomendasi;
+													data_usulan_.rekom_setwan_koefisien = usulan.rekom_setwan.koefisien;
+													data_usulan_.rekom_setwan_anggaran = usulan.rekom_setwan.anggaran;
+												}
+												if (usulan.rekom_lurah) {
+													data_usulan_.rekom_lurah_rekomendasi = usulan.rekom_lurah.rekomendasi;
+													data_usulan_.rekom_lurah_koefisien = usulan.rekom_lurah.koefisien;
+													data_usulan_.rekom_lurah_anggaran = usulan.rekom_lurah.anggaran;
+												}
+												if (usulan.rekom_mitra) {
+													data_usulan_.rekom_mitra_rekomendasi = usulan.rekom_mitra.rekomendasi;
+													data_usulan_.rekom_mitra_koefisien = usulan.rekom_mitra.koefisien;
+													data_usulan_.rekom_mitra_anggaran = usulan.rekom_mitra.anggaran;
+												}
+												if (usulan.rekom_skpd) {
+													data_usulan_.rekom_skpd_rekomendasi = usulan.rekom_skpd.rekomendasi;
+													data_usulan_.rekom_skpd_koefisien = usulan.rekom_skpd.koefisien;
+													data_usulan_.rekom_skpd_anggaran = usulan.rekom_skpd.anggaran;
+												}
+												if (usulan.rekom_tapd) {
+													data_usulan_.rekom_tapd_rekomendasi = usulan.rekom_tapd.rekomendasi;
+													data_usulan_.rekom_tapd_koefisien = usulan.rekom_tapd.koefisien;
+													data_usulan_.rekom_tapd_anggaran = usulan.rekom_tapd.anggaran;
+												}
+												data_usulan_.active = 1; 
+												return resolve(data_usulan_);
+											}
+										})
+										.fail(function () {
+											console.log('Koneksi error. Coba lagi' + retries); // prrint retry count
+											retries > 0 && setTimeout(function () {
+												runAjax1(--retries);
+											}, delay);
+										});
+									})(20);
+								})
+								.catch(function(e){
+									console.log(e);
+									return Promise.resolve(usulan);
+								});
+							});
+
+							Promise.all(sendData)
+							.then(function(all_usulan){
+								var opsi = {
+									action: 'singkron_data_usulan',
+									tahun_anggaran: ta,
+									jenis: jenis,
+									api_key: config.api_key,
+									data_usulan: all_usulan
+								};
+								var data = {
+									message:{
+						
+										type: "get-url",
+										content: {
+											url: config.url_server_lokal,
+											type: 'post',
+											data: opsi,
+											return: false
+										}
+									}
+								};
+								console.log('All Usulan',all_usulan);
+								if (all_usulan.length > 0) {
+									chrome.runtime.sendMessage(data, function(response) {
+										console.log('responeMessage', response);
+									});
+								} 
+								// var c_persen = +jQuery('#persen-loading').attr('persen');
+								// c_persen++;
+								// jQuery('#persen-loading').attr('persen', c_persen);
+								// jQuery('#persen-loading').html(((c_persen/data_all.length)*100).toFixed(2)+'%');
+								return resolve_redurce(nextData);
+							})
+							.catch(function(err){
+								console.log('err', err);
+								return resolve_redurce(nextData);
+							});
+						})
+						.catch(function(e){
+							console.log(e);
+							return Promise.resolve(nextData);
 						});
-					} 
+					})
+					.catch(function(e){
+						console.log(e);
+						return Promise.resolve(nextData);
+					});
+				}, Promise.resolve(data_all[last]))
+				.then(function(data_last){
+					// console.log(data_last);
+					// jQuery('#wrap-loading').hide();
+					// jQuery('#persen-loading').html('');
+					// jQuery('#persen-loading').attr('persen', '');
+					// jQuery('#persen-loading').attr('total', '');
+					// sweetAlert('Data berhasil disimpan di database lokal!');
 				})
-				.catch(function(err){
-					console.log('err', err);
-					alert('Ada kesalahan sistem!');
-					jQuery('#wrap-loading').hide();
+				.catch(function(e){
+					console.log(e);
+				});
+			}
+		})
+		.fail(function(){
+			console.log('Koneksi error. Coba lagi'+retries); // prrint retry count
+			retries > 0 && setTimeout(function(){
+				runAjax(--retries);
+			},delay);
+		})
+	})(20);
+//	return callback();
+}
+
+function imporRekap(ta,jenis) {
+	(function runAjax(retries, delay){
+		delay = delay || 30000;
+		jQuery.ajax({
+			url: config.sipd_url + 'daerah/main/budget/rekap/' + ta + '/tampil-belanja/' + config.id_daerah + '/0?model=sub_bl_prog_sub_giat_rek',
+			timeout: 60000,
+			contentType: 'application/json',
+			success: function (data) {
+				var data_all = [];
+				var data_sementara = [];
+				console.log(data.data.length);
+				data.data.map(function(b, i){
+					//console.log(i);
+					data_sementara.push(b);
+					var n = i+1;
+					if(n%500 == 0 || n == data.data.length){
+						console.log(n);
+						data_all.push(data_sementara);
+						data_sementara = [];
+					}
+				});
+
+				var i = 0;
+				var last = data_all.length-1;
+				data_all.reduce(function(sequence, nextData){
+					return sequence.then(function(current_data){
+						return new Promise(function(resolve_redurce, reject_redurce){
+							var sendData = current_data.map(function(rekap_, n){
+								return new Promise(function(resolve, reject){
+									data_rekap_ = rekap_;
+									return resolve(data_rekap_);
+								})
+								.catch(function(e){
+									console.log(e);
+									return Promise.resolve(rekap_);
+								});
+							});
+							Promise.all(sendData)
+							.then(function(all_rekap){
+								var opsi = {
+									action: 'singkron_data_rekap',
+									tahun_anggaran: ta,
+									jenis: jenis,
+									api_key: config.api_key,
+									data_rekap: all_rekap
+								};
+								var data = {
+									message:{
+										type: "get-url",
+										content: {
+											url: config.url_server_lokal,
+											type: 'post',
+											data: opsi,
+											return: false
+										}
+									}
+								};
+								console.log('All Rekap',all_rekap);
+								if (all_rekap.length > 0) {
+									chrome.runtime.sendMessage(data, function(response) {
+										console.log('Respon Send Rekap', response);
+									});
+								} 
+								// var c_persen = +jQuery('#persen-loading').attr('persen');
+								// c_persen++;
+								// jQuery('#persen-loading').attr('persen', c_persen);
+								// jQuery('#persen-loading').html(((c_persen/data_all.length)*100).toFixed(2)+'%');
+								return resolve_redurce(nextData);
+							})
+							.catch(function(err){
+								console.log('err', err);
+								return resolve_redurce(nextData);
+							});
+						})
+						.catch(function(e){
+							console.log(e);
+							return Promise.resolve(nextData);
+						});
+					})
+					.catch(function(e){
+						console.log(e);
+						return Promise.resolve(nextData);
+					});
+				}, Promise.resolve(data_all[last]))
+				.then(function(data_last){
+					// console.log(data_last);
+					// jQuery('#wrap-loading').hide();
+					// jQuery('#persen-loading').html('');
+					// jQuery('#persen-loading').attr('persen', '');
+					// jQuery('#persen-loading').attr('total', '');
+					// sweetAlert('Data berhasil disimpan di database lokal!');
+				})
+				.catch(function(e){
+					console.log(e);
 				});
 			}
 		})
@@ -397,7 +567,6 @@ function proses_data_usulan (jenis,level,ta) {
 		})
 	})(20);
 }
-
 function imporKamus(jenis) {  
 	var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xlsx|.xls)$/;  
 	/*Checks whether the file is a valid excel file*/  

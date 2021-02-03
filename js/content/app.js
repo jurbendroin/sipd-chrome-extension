@@ -33,6 +33,7 @@ function run_script(code){
 
 // http://swwwitch.com/dl/Font-Awesome-Cheetsheet-4.5.0.pdf
 jQuery(document).ready(function(){
+	jQuery('body').append('<style type="text/css">.swal-footer{text-align: center}<style>');
 	if(config.replace_logo){
 		var logo = chrome.runtime.getURL("img/logo.png");
 		if(jQuery('.media-body img').length >=1){
@@ -275,10 +276,13 @@ jQuery(document).ready(function(){
 						success: function(data){
 							var data_all = [];
 							var data_sementara = [];
+							console.log(data.data.length);
 							data.data.map(function(b, i){
+								//console.log(i);
 								data_sementara.push(b);
 								var n = i+1;
-								if(n%50 == 0){
+								if(n%50 == 0 || n == data.data.length){
+									console.log(n);
 									data_all.push(data_sementara);
 									data_sementara = [];
 								}
@@ -1468,7 +1472,16 @@ function tampil_semua_halaman(){
 }
 
 function singkron_skpd_ke_lokal(){
-	if(confirm('Apakah anda yakin melakukan ini? data lama akan diupdate dengan data terbaru.')){
+	swal({
+		title: "Peringatan!",
+		text: "Apakah anda yakin melakukan ini? data lama akan diupdate dengan data terbaru.",
+		icon: "warning",
+		buttons: true,
+		// dangerMode: true,
+	  })
+	.then((confirm) => {
+	if (confirm) {
+	// if(confirm('Apakah anda yakin melakukan ini? data lama akan diupdate dengan data terbaru.')){
 		jQuery('#wrap-loading').show();
 		var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
 		(function runAjax(retries, delay){
@@ -1671,7 +1684,7 @@ function singkron_skpd_ke_lokal(){
 				},delay);
 			})
 		})(20);
-	}
+	}});
 }
 
 async function singkron_rka_ke_lokal_all(opsi_unit, callback) {
