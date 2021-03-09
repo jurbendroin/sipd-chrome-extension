@@ -79,29 +79,40 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 		response = "Sukses run-actions "+actions;
 		sendResponse(response);
 	}else if(type == 'get-url'){
-		jQuery.ajax({
-		    url: request.message.content.url,
-		    type: request.message.content.type,
-		    data: request.message.content.data,
-		    dataType: 'json',
-		    success:function(ret){
-		    	if(request.message.content.return){
-			     	var options = {
-			     		type: 'response-fecth-url',
-						tab: tab_id,
-			     		data: ret
-			     	}
-			     	sendMessageTabActive(options);
-			    }
-		        // console.log(ret, request.message.content);
-				response = ret.message;
-				sendResponse(response);
-		    },
-		    error:function(){
-				response = "Complete "+request.message.content.data.action+" with error.";
-				sendResponse(response);
-		    }      
-		});
+		(function runAjax(retries, delay){
+			delay = delay || 30000;
+			jQuery.ajax({
+				url: request.message.content.url,
+				type: request.message.content.type,
+				data: request.message.content.data,
+				dataType: 'json',
+				timeout: 30000,
+				success:function(ret){
+					if(request.message.content.return){
+						var options = {
+							type: 'response-fecth-url',
+							tab: tab_id,
+							data: ret
+						}
+						sendMessageTabActive(options);
+					}
+					// console.log(ret, request.message.content);
+					response = ret.message;
+					sendResponse(response);
+				}    
+			})
+			.fail(function(){
+				console.log('Koneksi error. Coba lagi'+retries); // print retry count
+				if (retries > 0) {
+					setTimeout(function(){ 
+						runAjax(--retries);
+					},delay);
+				} else {
+					response = "Complete "+request.message.content.data.action+" with error.";
+					sendResponse(response);
+				}
+			})
+		})(20);
 	} else {sendResponse("THANKS from background!");}
 	return true;
 });
