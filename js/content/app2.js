@@ -132,14 +132,23 @@ jQuery(document).ready(function () {
             }
         }
     } else if (current_url.indexOf('main/budget/rpjmd/' + config.tahun_anggaran) != -1) {      //rpjmd
-        var singkron_data_rpjmd = ''
-            + '<button class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron_data_rpjmd_lokal">'
+		var singkron_data_rpjmd = ''
+			+ '<div style="background: white;padding: 25px;border: lightgrey;border-style: outset;border-width: thin;">'
+			+ '<input type="file" id="excelfile" />'
+			+ '<input type="button" class="fcbtn btn btn-danger btn-outline btn-1b" id="impor_rpjmd" value="Impor Program RPJMD ke SIPD" />'
+			+ '<button class="fcbtn btn btn-danger btn-outline pull-right btn-1b" id="singkron_data_rpjmd_lokal">'
             + '<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron RPJMD ke DB lokal</span>'
-            + '</button>';
-        jQuery('#reset_program').parent().append(singkron_data_rpjmd);
+			+ '</button>'
+			+ '</div>';
+		jQuery('body').append('<style type="text/css">input[type=file] {width: 100%; }<style>');
+
+        jQuery('.white-box').parent().prepend(singkron_data_rpjmd);
 
         jQuery('#singkron_data_rpjmd_lokal').on('click', function () {
             singkron_data_rpjmd_lokal();
+        });
+        jQuery('#impor_rpjmd').on('click', function () {
+			impor_rpjmd();
         });
 
         function singkron_data_rpjmd_lokal() {
@@ -218,13 +227,17 @@ jQuery(document).ready(function () {
 	} else if ((current_url.indexOf('/main/plan/reses/') != -1)||(current_url.indexOf('/main/plan/asmas/') != -1)) { //Usulan Masyarakat ataupun Reses / Pokok Pikiran
 		var ta = window.location.href.split('/')[7];
 		var singkron_data_usulan = ''
-			+ '<div class="pull-right p-t-10 m-b-20">'
-            + '<button class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron_data_usulan_lokal">'
+            + '<button class="fcbtn btn btn-warning btn-outline btn-1b" id="singkron_data_usulan_lokal">'
             + '<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron Usulan ke DB lokal</span>'
-			+ '</button>'
-			+ '</div>';
+			+ '</button>';
         jQuery('.panel-heading').append(singkron_data_usulan);
-
+		var _show_nama_dewan = ''
+			+'<button onclick="return false;" class="fcbtn btn btn-warning btn-outline btn-1b" id="show_nama_dewan">'
+				+'<i class="fa fa-eye m-r-5"></i> <span>Tampilkan Nama Dewan</span>'
+			+'</button>';
+		if (false) {
+			jQuery('.panel-heading').append(_show_nama_dewan);
+		}
         jQuery('#singkron_data_usulan_lokal').on('click', function () {
 			if (current_url.indexOf('/main/plan/reses/') != -1) {
 				singkron_data_usulan_lokal("reses",ta);
@@ -232,18 +245,78 @@ jQuery(document).ready(function () {
 				singkron_data_usulan_lokal("asmas",ta);
 			}
         });
+		jQuery('#show_nama_dewan').on('click', function(){
+			jQuery('#wrap-loading').show();
+			show_nama_dewan('reses',ta);
+		});
 
         function singkron_data_usulan_lokal(jenis,ta) {
             if (confirm('Apakah anda yakin melakukan ini? data lama akan diupdate dengan data terbaru.')) {
 				jQuery('#wrap-loading').show();
+				jQuery('#persen-loading').attr('progress', 0);
+				jQuery('#persen-loading').html('0.00%');
+				jQuery('#persen-loading').attr('total', 0);
 				proses_data_usulan(jenis,'verif_mitra',ta);
 				proses_data_usulan(jenis,'verif_tapd',ta);
 				proses_data_usulan(jenis,'monitor',ta);
 				proses_data_usulan(jenis,'tolak',ta);
 				proses_data_usulan(jenis,'',ta);
-				jQuery('#wrap-loading').hide();
             }
-        }
+			jQuery('#wrap-loading').hide();
+		}
+		function show_nama_dewan(jenis,ta){
+			jQuery('#table_verif tbody tr').map(function(i, b){
+				console.log('b',b);
+				var id = jQuery(b).find('td').eq(15).find('a').attr('onclick');
+				console.log('id full',id);
+				if(id){
+					id = id.split("'")[1];
+					_nama = id;
+					_fraksi = id;
+					var nama = jQuery(b).find('td').eq(1);
+					var fraksi = jQuery(b).find('td').eq(2);
+					nama.html('( '+_nama+' ) '+nama.html());
+					fraksi.html('( '+_fraksi+' ) '+fraksi.html());
+				}
+				console.log('id',id);
+			});
+			jQuery('#table_monitor tbody tr').map(function(i, b){
+				console.log('b',b);
+				var id = jQuery(b).find('td').eq(15).find('a').attr('onclick');
+				console.log('id full',id);
+				if(id){
+					id = id.split("'")[1];
+					(function runAjax1(retries, delay) {
+						delay = delay || 15000;
+						jQuery.ajax({
+							url: config.sipd_url + 'daerah/main/plan/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
+							type: "post",
+							timeout: 180000,
+							data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id,
+							success: function (rinciusulan_) {
+								var id_pengusul = rinciusulan_.created_user;
+								console.log('id_pengusul', id_pengusul);
+							}
+						})
+						.fail(function () {
+							console.log('Koneksi error. Coba lagi' + retries); // prrint retry count
+							retries > 0 && setTimeout(function () {
+								runAjax1(--retries);
+							}, delay);
+						});
+					})(20);
+					_nama = id;
+					_fraksi = id;
+					var nama = jQuery(b).find('td').eq(1);
+					var fraksi = jQuery(b).find('td').eq(2);
+					nama.html('( '+_nama+' ) '+nama.html());
+					fraksi.html('( '+_fraksi+' ) '+fraksi.html());
+				}
+				console.log('id',id);
+			});
+			jQuery('#wrap-loading').hide();
+		}
+
 	} else if ((current_url.indexOf('/main/plan/kamus-usulan/' + config.tahun_anggaran + '/asmas/list') != -1) || (current_url.indexOf('/main/plan/kamus-usulan/' + config.tahun_anggaran + '/reses/list') != -1)) { //Kamus Usulan Masyarakat
 		var html_impor_kamus = ''
 			+ '<input type="file" id="excelfile" />'
@@ -277,9 +350,8 @@ function proses_data_usulan (jenis,level,ta,callback) {
 	} else if (level == 'tolak') {
 		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-usul-tolak/' + config.id_daerah + '/0';
 	} else var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-usulan/' + config.id_daerah + '/0';
-	// jQuery('#wrap-loading').show();
-	// jQuery('#persen-loading').attr('persen', 0);
-	// jQuery('#persen-loading').html('0%');
+	var c_total = +jQuery('#persen-loading').attr('total')+1;
+	jQuery('#persen-loading').attr('total', c_total);
 	(function runAjax(retries, delay){
 		delay = delay || 30000;
 		jQuery.ajax({
@@ -289,13 +361,17 @@ function proses_data_usulan (jenis,level,ta,callback) {
 			success: function (data) {
 				var data_all = [];
 				var data_sementara = [];
+				var c_total = +jQuery('#persen-loading').attr('total')+data.data.length-1;
+				var c_progress = +jQuery('#persen-loading').attr('progress');
+				jQuery('#persen-loading').attr('total', c_total);
+				jQuery('#persen-loading').attr('progress', c_progress);
+				if (data.data.length) jQuery('#persen-loading').html((((c_progress)/c_total)*100).toFixed(2)+'%'+'<br>');
+				jQuery('#wrap-loading').show();
 				console.log(data.data.length);
 				data.data.map(function(b, i){
-					//console.log(i);
 					data_sementara.push(b);
 					var n = i+1;
 					if(n%50 == 0 || n == data.data.length){
-						console.log(n);
 						data_all.push(data_sementara);
 						data_sementara = [];
 					}
@@ -314,11 +390,11 @@ function proses_data_usulan (jenis,level,ta,callback) {
 										var id_usulan = usulan.id_usulan;
 									}	
 									(function runAjax1(retries, delay) {
-										delay = delay || 30000;
+										delay = delay || 15000;
 										jQuery.ajax({
 											url: config.sipd_url + 'daerah/main/plan/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
 											type: "post",
-											timeout: 30000,
+											timeout: 180000,
 											data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
 											success: function (rinciusulan_) {
 												data_usulan_ = usulan;
@@ -412,16 +488,21 @@ function proses_data_usulan (jenis,level,ta,callback) {
 										}
 									}
 								};
-								console.log('All Usulan',all_usulan);
+								// console.log('All Usulan',all_usulan);
 								if (all_usulan.length > 0) {
 									chrome.runtime.sendMessage(data, function(response) {
 										console.log('responeMessage', response);
+										var c_total = +jQuery('#persen-loading').attr('total');
+										var c_progress = +jQuery('#persen-loading').attr('progress')+all_usulan.length;
+										jQuery('#persen-loading').attr('total', c_total);
+										jQuery('#persen-loading').attr('progress', c_progress);
+										jQuery('#persen-loading').html((((c_progress)/c_total)*100).toFixed(2)+'%'+'<br>');
+										if (c_progress == c_total) {
+											console.log('Selesai memproses sub kegiatan terakhir.', response);
+											jQuery('#wrap-loading').hide();
+										}
 									});
 								} 
-								// var c_persen = +jQuery('#persen-loading').attr('persen');
-								// c_persen++;
-								// jQuery('#persen-loading').attr('persen', c_persen);
-								// jQuery('#persen-loading').html(((c_persen/data_all.length)*100).toFixed(2)+'%');
 								return resolve_redurce(nextData);
 							})
 							.catch(function(err){
@@ -440,12 +521,6 @@ function proses_data_usulan (jenis,level,ta,callback) {
 					});
 				}, Promise.resolve(data_all[last]))
 				.then(function(data_last){
-					// console.log(data_last);
-					// jQuery('#wrap-loading').hide();
-					// jQuery('#persen-loading').html('');
-					// jQuery('#persen-loading').attr('persen', '');
-					// jQuery('#persen-loading').attr('total', '');
-					// sweetAlert('Data berhasil disimpan di database lokal!');
 				})
 				.catch(function(e){
 					console.log(e);
@@ -459,7 +534,6 @@ function proses_data_usulan (jenis,level,ta,callback) {
 			},delay);
 		})
 	})(20);
-//	return callback();
 }
 
 function imporRekap(ta,jenis) {
@@ -525,10 +599,6 @@ function imporRekap(ta,jenis) {
 										console.log('Respon Send Rekap', response);
 									});
 								} 
-								// var c_persen = +jQuery('#persen-loading').attr('persen');
-								// c_persen++;
-								// jQuery('#persen-loading').attr('persen', c_persen);
-								// jQuery('#persen-loading').html(((c_persen/data_all.length)*100).toFixed(2)+'%');
 								return resolve_redurce(nextData);
 							})
 							.catch(function(err){
@@ -547,12 +617,6 @@ function imporRekap(ta,jenis) {
 					});
 				}, Promise.resolve(data_all[last]))
 				.then(function(data_last){
-					// console.log(data_last);
-					// jQuery('#wrap-loading').hide();
-					// jQuery('#persen-loading').html('');
-					// jQuery('#persen-loading').attr('persen', '');
-					// jQuery('#persen-loading').attr('total', '');
-					// sweetAlert('Data berhasil disimpan di database lokal!');
 				})
 				.catch(function(e){
 					console.log(e);
@@ -662,6 +726,114 @@ function inputKamus(jenis,jsondata) {/*Function used to input the JSON array to 
 
 	}  
 }  
+function impor_rpjmd() {  
+	var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xlsx|.xls)$/;  
+	/*Checks whether the file is a valid excel file*/  
+	if (regex.test($("#excelfile").val().toLowerCase())) {  
+		var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/  
+		if ($("#excelfile").val().toLowerCase().indexOf(".xlsx") > 0) {  
+			xlsxflag = true;  
+		}  
+		/*Checks whether the browser supports HTML5*/  
+		if (typeof (FileReader) != "undefined") {  
+			var reader = new FileReader();  
+			reader.onload = function (e) {  
+				var data = e.target.result;  
+				/*Converts the excel data in to object*/  
+				if (xlsxflag) {  
+					var workbook = XLSX.read(data, { type: 'binary' });  
+				}  
+				else {  id
+					var workbook = XLS.read(data, { type: 'binary' });  
+				}  
+				/*Gets all the sheetnames of excel in to a variable*/  
+				var sheet_name_list = workbook.SheetNames;  
+ 
+				var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/  
+				sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/  
+					/*Convert the cell value to Json*/  
+					if (xlsxflag) {  
+						var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);  
+					}  
+					else {  
+						var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);  
+					}  
+					if (exceljson.length > 0 && cnt == 0) {  
+						//BindTable(exceljson, '#exceltable');  
+						input_rpjmd(exceljson);
+						cnt++;  
+					}  
+				});  
+			}  
+			if (xlsxflag) {/*If excel file is .xlsx extension than creates a Array Buffer from excel*/  
+				reader.readAsArrayBuffer($("#excelfile")[0].files[0]);  
+			}  
+			else {  
+				reader.readAsBinaryString($("#excelfile")[0].files[0]);  
+			}  
+		}  
+		else {  
+			alert("Sorry! Your browser does not support HTML5!");  
+		}  
+	}  
+	else {  
+		alert("Please upload a valid Excel file!");  
+	}  
+}  
+
+function input_rpjmd(jsondata) {/*Function used to input the JSON array to Kamus Usulan SIPD*/  
+	var columns = getHeader(jsondata); /*Gets all the column headings of Excel*/  
+	//console.log(jsondata);
+	for (var i = 0; i < jsondata.length; i++) {  
+		for (var colIndex = 0; colIndex < columns.length; colIndex++) {  
+			var cellValue = jsondata[i][columns[colIndex]];  
+			if (cellValue == null) cellValue = "";  
+		}  
+		//data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
+		opsi = {
+			_token : jQuery('meta[name=_token]').attr('content'),
+			id_rpjmd: '',
+			visi_rpjmd: jsondata[i]['visi_rpjmd'],
+			misi_rpjmd: jsondata[i]['misi_rpjmd'],
+			tujuan_rpjmd: jsondata[i]['tujuan_rpjmd'],
+			sasaran_rpjmd: jsondata[i]['sasaran_rpjmd'],
+			strategi_rpjmd: jsondata[i]['strategi_rpjmd'],
+			kebijakan_rpjmd: jsondata[i]['kebijakan_rpjmd'],
+			urusan_rpjmd: jsondata[i]['urusan_rpjmd'],
+			program_rpjmd: jsondata[i]['program_rpjmd'],
+			outcome_teks: jsondata[i]['outcome_teks'],
+			target_outcome: [jsondata[i]['target_outcome_1'],jsondata[i]['target_outcome_2'],jsondata[i]['target_outcome_3'],jsondata[i]['target_outcome_4'],jsondata[i]['target_outcome_5']],
+			satuan_outcome: [jsondata[i]['satuan_outcome_1'],jsondata[i]['satuan_outcome_2'],jsondata[i]['satuan_outcome_3'],jsondata[i]['satuan_outcome_4'],jsondata[i]['satuan_outcome_5']],
+			anggaran_outcome: [jsondata[i]['anggaran_outcome_1'],jsondata[i]['anggaran_outcome_2'],jsondata[i]['anggaran_outcome_3'],jsondata[i]['anggaran_outcome_4'],jsondata[i]['anggaran_outcome_5']],
+			// 'target_outcome[]': jsondata[i]['target_outcome_2'],
+			// 'satuan_outcome[]': jsondata[i]['satuan_outcome_2'],
+			// 'anggaran_outcome[]': jsondata[i]['anggaran_outcome_2'],
+			// 'target_outcome[]': jsondata[i]['target_outcome_3'],
+			// 'satuan_outcome[]': jsondata[i]['satuan_outcome_3'],
+			// 'anggaran_outcome[]': jsondata[i]['anggaran_outcome_3'],
+			// 'target_outcome[]': jsondata[i]['target_outcome_4'],
+			// 'satuan_outcome[]': jsondata[i]['satuan_outcome_4'],
+			// 'anggaran_outcome[]': jsondata[i]['anggaran_outcome_4'],
+			// 'target_outcome[]': jsondata[i]['target_outcome_5'],
+			// 'satuan_outcome[]': jsondata[i]['satuan_outcome_5'],
+			// 'anggaran_outcome[]': jsondata[i]['anggaran_outcome_5'],
+			opd_rpjmd: jsondata[i]['opd_rpjmd']
+		}
+		jQuery.ajax({
+			//'https://karawangkab.sipd.kemendagri.go.id/daerah/main/budget/rpjmd/2021/simpan-rpjmd/17/0'
+		    url: config.sipd_url + 'daerah/main/budget/rpjmd/' + config.tahun_anggaran + '/simpan-rpjmd/' + config.id_daerah + '/0',
+		    type: 'post',
+		    data: opsi,
+		    success:function(ret){
+		        console.log('Input RPJMD',ret);
+		    },
+		    error:function(){
+				console.log('Input RPJMD error');
+		    }      
+		});
+		console.log(opsi);
+	}  
+}  
 
 function getHeader(jsondata) {/*Function used to get all column names from JSON*/  
 	var columnSet = [];  
@@ -675,6 +847,6 @@ function getHeader(jsondata) {/*Function used to get all column names from JSON*
 			}  
 		}  
 	}  
-	console.log(columnSet);
+	// console.log(columnSet);
 	return columnSet;  
 }  
