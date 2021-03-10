@@ -21,22 +21,54 @@ injectScript( chrome.extension.getURL('/config.js'), 'html');
 // });
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
+	var current_url = window.location.href;
 	if(request.type == 'response-fecth-url'){
 		jQuery('#wrap-loading').hide();
 		jQuery('#persen-loading').html('');
 		jQuery('#persen-loading').attr('persen', '');
 		jQuery('#persen-loading').attr('total', '');
 		var res = request.data;
-		var message = res.message;
-		if (res.simda_status) message += '\nStatus Singkron Simda: '+res.simda_status;
-		if (res.simda_msg) message += '\nPesan Singkron Simda: '+res.simda_msg;
-		swal({
-			title: res.status,
-			text: message,
-			icon: res.status,
-			//timer: 10000,
-		});
+		var _alert = true;
+		if(res.action == 'singkron_unit'){
+			window.data_unit = res.renja_link;
+			if(current_url.indexOf('skpd/'+config.tahun_anggaran+'/list/'+config.id_daerah+'') != -1){
+				jQuery('#table_skpd tbody tr').map(function(i, b){
+					var td = jQuery(b).find('td');
+					var id_skpd = td.find('ul.dropdown-menu li').eq(0).find('a').attr('onclick').split("'")[1];
+					id_skpd = id_skpd.split("'")[0];
+					if(td.eq(1).find('a').length == 0){
+						td.eq(1).append(' <a target="_blank" href="'+data_unit[id_skpd]+'?key='+config.api_key+'">Print RENJA</a>');
+					}
+				});
+			}
+		}else if(res.action == 'get_link_laporan'){
+			if(
+				res.link 
+				&& res.cetak == 'apbd'
+				&& res.model == 'perkada'
+			){
+				_alert = false;
+				if(res.jenis == '1'){
+				    var link = ''
+				        +'<a target="_blank" href="'+res.link+'?key='+config.api_key+'" class="set-lampiran apbd-penjabaran-lampiran-1 btn btn-success pull-right" style="margin-right: 10px;">(LOCAL) '+res.text_link+'</a>';
+				    jQuery('#mod-hist-jadwal .modal-header .btn-circle').after(link);
+				}else if(res.jenis == '2'){
+
+				}
+			}
+		}
+		if(_alert){
+			var message = res.message;
+			if (res.simda_status) message += '\nStatus Singkron Simda: '+res.simda_status;
+			if (res.simda_msg) message += '\nPesan Singkron Simda: '+res.simda_msg;
+			swal({
+				title: res.status,
+				text: message,
+				icon: res.status,
+				//timer: 10000,
+			});
 		// console.log(request.data);
+		}
 	}else if(request.type == 'response-actions'){
 		try {
 			var runjob = false;

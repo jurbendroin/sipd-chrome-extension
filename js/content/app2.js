@@ -1,7 +1,7 @@
 jQuery(document).ready(function () {
     var current_url = window.location.href;
 
-    if ((current_url.indexOf('main/budget/subgiat/' + config.tahun_anggaran) != -1) || (current_url.indexOf('main/plan/subgiat/' + config.tahun_anggaran) != -1)) {	//sub_data_program_kegiatan
+    if (current_url.indexOf('main/'+get_type_jadwal()+'/subgiat/' + config.tahun_anggaran) != -1) {	//sub_data_program_kegiatan
         var singkron_data_giat = ''
             + '<button class="fcbtn btn btn-primary btn-outline btn-1b" id="singkron_data_giat_lokal">'
             + '<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron Program Kegiatan ke DB lokal</span>'
@@ -20,7 +20,7 @@ jQuery(document).ready(function () {
 				(function runAjax(retries, delay){
 					delay = delay || 30000;
 					jQuery.ajax({
-						url: config.sipd_url + 'daerah/main/budget/subgiat/' + config.tahun_anggaran + '/tampil-sub-giat/' + config.id_daerah + '/' + id_unit + '?filter_program=&filter_giat=&filter_sub_giat=',
+						url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/subgiat/' + config.tahun_anggaran + '/tampil-sub-giat/' + config.id_daerah + '/' + id_unit + '?filter_program=&filter_giat=&filter_sub_giat=',
 						timeout: 30000,
 						contentType: 'application/json',
 						success: function (data) {
@@ -61,7 +61,7 @@ jQuery(document).ready(function () {
 				})(20);
             }
         }
-    } else if (current_url.indexOf('main/budget/dana/' + config.tahun_anggaran) != -1) {
+    } else if (current_url.indexOf('main/'+get_type_jadwal()+'/dana/' + config.tahun_anggaran) != -1) {
 
         var singkron_sumber_dana = ''
             + '<button class="fcbtn btn btn-warning btn-outline btn-1b" id="singkron_sumber_dana_lokal">'
@@ -80,7 +80,7 @@ jQuery(document).ready(function () {
 				(function runAjax(retries, delay){
 					delay = delay || 30000;
 					jQuery.ajax({
-						url: config.sipd_url + 'daerah/main/budget/dana/' + config.tahun_anggaran + '/tampil-dana/' + config.id_daerah + '/' + id_unit,
+						url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/dana/' + config.tahun_anggaran + '/tampil-dana/' + config.id_daerah + '/' + id_unit,
 						timeout: 30000,
 						contentType: 'application/json',
 						success: function (data) {
@@ -131,7 +131,7 @@ jQuery(document).ready(function () {
 				})(20, 30000);
             }
         }
-    } else if (current_url.indexOf('main/budget/rpjmd/' + config.tahun_anggaran) != -1) {      //rpjmd
+    } else if (current_url.indexOf('main/'+get_type_jadwal()+'/rpjmd/' + config.tahun_anggaran) != -1) {      //rpjmd
 		var singkron_data_rpjmd = ''
 			+ '<div style="background: white;padding: 25px;border: lightgrey;border-style: outset;border-width: thin;">'
 			+ '<input type="file" id="excelfile" />'
@@ -158,7 +158,7 @@ jQuery(document).ready(function () {
 				(function runAjax(retries, delay){
 					delay = delay || 30000;
 					jQuery.ajax({
-						url: config.sipd_url + 'daerah/main/budget/rpjmd/' + config.tahun_anggaran + '/tampil-rpjmd/' + config.id_daerah + '/' + id_unit + '?filter_program=&filter_indi_prog=&filter_skpd=',
+						url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/rpjmd/' + config.tahun_anggaran + '/tampil-rpjmd/' + config.id_daerah + '/' + id_unit + '?filter_program=&filter_indi_prog=&filter_skpd=',
 						timeout: 30000,
 						contentType: 'application/json',
 						success: function (data) {
@@ -224,7 +224,7 @@ jQuery(document).ready(function () {
 				})(20, 30000);
             }
         }
-	} else if ((current_url.indexOf('/main/plan/reses/') != -1)||(current_url.indexOf('/main/plan/asmas/') != -1)) { //Usulan Masyarakat ataupun Reses / Pokok Pikiran
+	} else if ((current_url.indexOf('/main/'+get_type_jadwal()+'/reses/') != -1)||(current_url.indexOf('/main/'+get_type_jadwal()+'/asmas/') != -1)) { //Usulan Masyarakat ataupun Reses / Pokok Pikiran
 		var ta = window.location.href.split('/')[7];
 		var singkron_data_usulan = ''
             + '<button class="fcbtn btn btn-warning btn-outline btn-1b" id="singkron_data_usulan_lokal">'
@@ -239,7 +239,7 @@ jQuery(document).ready(function () {
 			jQuery('.panel-heading').append(_show_nama_dewan);
 		}
         jQuery('#singkron_data_usulan_lokal').on('click', function () {
-			if (current_url.indexOf('/main/plan/reses/') != -1) {
+			if (current_url.indexOf('/main/'+get_type_jadwal()+'/reses/') != -1) {
 				singkron_data_usulan_lokal("reses",ta);
 			} else {
 				singkron_data_usulan_lokal("asmas",ta);
@@ -289,7 +289,7 @@ jQuery(document).ready(function () {
 					(function runAjax1(retries, delay) {
 						delay = delay || 15000;
 						jQuery.ajax({
-							url: config.sipd_url + 'daerah/main/plan/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
+							url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
 							type: "post",
 							timeout: 180000,
 							data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id,
@@ -317,12 +317,12 @@ jQuery(document).ready(function () {
 			jQuery('#wrap-loading').hide();
 		}
 
-	} else if ((current_url.indexOf('/main/plan/kamus-usulan/' + config.tahun_anggaran + '/asmas/list') != -1) || (current_url.indexOf('/main/plan/kamus-usulan/' + config.tahun_anggaran + '/reses/list') != -1)) { //Kamus Usulan Masyarakat
+	} else if ((current_url.indexOf('/main/'+get_type_jadwal()+'/kamus-usulan/' + config.tahun_anggaran + '/asmas/list') != -1) || (current_url.indexOf('/main/'+get_type_jadwal()+'/kamus-usulan/' + config.tahun_anggaran + '/reses/list') != -1)) { //Kamus Usulan Masyarakat
 		var html_impor_kamus = ''
 			+ '<input type="file" id="excelfile" />'
 			+ '<input type="button" id="impor_kamus" value="Impor Kamus ke Sistem" />';
 		jQuery('.panel-heading').append(html_impor_kamus);
-		if (current_url.indexOf('/main/plan/kamus-usulan/' + config.tahun_anggaran + '/asmas/list') != -1) {
+		if (current_url.indexOf('/main/'+get_type_jadwal()+'/kamus-usulan/' + config.tahun_anggaran + '/asmas/list') != -1) {
 			jenis = 'asmas';
 		} else {
 			jenis = 'reses';
@@ -330,7 +330,7 @@ jQuery(document).ready(function () {
         jQuery('#impor_kamus').on('click', function () {
 			imporKamus(jenis);
         });
-	} else if (current_url.indexOf('/main/budget/rekap/' + config.tahun_anggaran + '/belanja/') != -1) { 
+	} else if (current_url.indexOf('/main/'+get_type_jadwal()+'/rekap/' + config.tahun_anggaran + '/belanja/') != -1) { 
 		var ta = window.location.href.split('/')[7];
 		var html_impor_rekap = ''
 			+ '<input type="button" id="impor_rekap" value="Impor Rekap ke Lokal" />';
@@ -342,14 +342,14 @@ jQuery(document).ready(function () {
 })
 function proses_data_usulan (jenis,level,ta,callback) {
 	if (level == 'verif_mitra') {
-		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-verif-usulan/' + config.id_daerah + '/0?verif_skpd=0&valid_tapd=0';
+		var url = config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/'+jenis+'/' + ta + '/tampil-verif-usulan/' + config.id_daerah + '/0?verif_skpd=0&valid_tapd=0';
 	} else if (level == 'verif_tapd') {
-		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-verif-usulan/' + config.id_daerah + '/0?verif_skpd=0&valid_tapd=1';
+		var url = config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/'+jenis+'/' + ta + '/tampil-verif-usulan/' + config.id_daerah + '/0?verif_skpd=0&valid_tapd=1';
 	} else if (level == 'monitor') {
-		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-monitor/' + config.id_daerah + '/0';
+		var url = config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/'+jenis+'/' + ta + '/tampil-monitor/' + config.id_daerah + '/0';
 	} else if (level == 'tolak') {
-		var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-usul-tolak/' + config.id_daerah + '/0';
-	} else var url = config.sipd_url + 'daerah/main/plan/'+jenis+'/' + ta + '/tampil-usulan/' + config.id_daerah + '/0';
+		var url = config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/'+jenis+'/' + ta + '/tampil-usul-tolak/' + config.id_daerah + '/0';
+	} else var url = config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/'+jenis+'/' + ta + '/tampil-usulan/' + config.id_daerah + '/0';
 	var c_total = +jQuery('#persen-loading').attr('total')+1;
 	jQuery('#persen-loading').attr('total', c_total);
 	(function runAjax(retries, delay){
@@ -392,7 +392,7 @@ function proses_data_usulan (jenis,level,ta,callback) {
 									(function runAjax1(retries, delay) {
 										delay = delay || 15000;
 										jQuery.ajax({
-											url: config.sipd_url + 'daerah/main/plan/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
+											url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
 											type: "post",
 											timeout: 180000,
 											data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
@@ -540,7 +540,7 @@ function imporRekap(ta,jenis) {
 	(function runAjax(retries, delay){
 		delay = delay || 30000;
 		jQuery.ajax({
-			url: config.sipd_url + 'daerah/main/budget/rekap/' + ta + '/tampil-belanja/' + config.id_daerah + '/0?model=sub_bl_prog_sub_giat_rek',
+			url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/rekap/' + ta + '/tampil-belanja/' + config.id_daerah + '/0?model=sub_bl_prog_sub_giat_rek',
 			timeout: 60000,
 			contentType: 'application/json',
 			success: function (data) {
@@ -713,7 +713,7 @@ function inputKamus(jenis,jsondata) {/*Function used to input the JSON array to 
 		}
 		jQuery.ajax({
 			//https://karawangkab.sipd.kemendagri.go.id/daerah/main/plan/kamus-usulan/2020/asmas/simpan-kamus/17/0
-		    url: config.sipd_url + 'daerah/main/plan/kamus-usulan/' + config.tahun_anggaran + '/' + jenis + '/simpan-kamus/' + config.id_daerah + '/0',
+		    url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/kamus-usulan/' + config.tahun_anggaran + '/' + jenis + '/simpan-kamus/' + config.id_daerah + '/0',
 		    type: 'post',
 		    data: opsi,
 		    success:function(ret){
@@ -821,7 +821,7 @@ function input_rpjmd(jsondata) {/*Function used to input the JSON array to Kamus
 		}
 		jQuery.ajax({
 			//'https://karawangkab.sipd.kemendagri.go.id/daerah/main/budget/rpjmd/2021/simpan-rpjmd/17/0'
-		    url: config.sipd_url + 'daerah/main/budget/rpjmd/' + config.tahun_anggaran + '/simpan-rpjmd/' + config.id_daerah + '/0',
+		    url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/rpjmd/' + config.tahun_anggaran + '/simpan-rpjmd/' + config.id_daerah + '/0',
 		    type: 'post',
 		    data: opsi,
 		    success:function(ret){

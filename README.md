@@ -2,8 +2,8 @@
 Optimasi aplikasi SIPD dengan chrome extension
 Semoga bermanfaat
 
-### Disponsori oleh:
-- https://www.instagram.com/lindodolan/ (BAJU ANAK MURAH MAGETAN)
+### DONASI
+- Donasi untuk pengembang aplikasi, klik di link ini https://smkasiyahhomeschooling.blogspot.com/p/donasi-pengembangan-smk-asiyah.html
 
 ### GRUP telegram https://t.me/sipd_chrome_extension
 
@@ -46,6 +46,7 @@ Semoga bermanfaat
 - Import data Pembiayaan
 - Integrasi data SIPD ke SIMDA keuangan
 - Nama TAPD lebih dari 8 orang
+- Get data rincian murni untuk printout APBD Penjabaran di wp-sipd lokal
 
 ### Pengembangan berikutnya:
 - Melengkapi dokumentasi penggunaan di halaman wiki
