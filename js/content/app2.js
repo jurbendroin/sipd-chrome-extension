@@ -361,7 +361,8 @@ function proses_data_usulan (jenis,level,ta,callback) {
 			success: function (data) {
 				var data_all = [];
 				var data_sementara = [];
-				var c_total = +jQuery('#persen-loading').attr('total')+data.data.length-1;
+				var data_length = data && data.data && data.data.length;
+				var c_total = +jQuery('#persen-loading').attr('total')+data_length-1;
 				var c_progress = +jQuery('#persen-loading').attr('progress');
 				jQuery('#persen-loading').attr('total', c_total);
 				jQuery('#persen-loading').attr('progress', c_progress);
