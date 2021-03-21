@@ -292,7 +292,7 @@ jQuery(document).ready(function () {
 							url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
 							type: "post",
 							timeout: 180000,
-							data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id,
+							data: "_token=" + tokek + '&idusulan=' + id,
 							success: function (rinciusulan_) {
 								var id_pengusul = rinciusulan_.created_user;
 								console.log('id_pengusul', id_pengusul);
@@ -396,7 +396,7 @@ function proses_data_usulan (jenis,level,ta,callback) {
 											url: config.sipd_url + 'daerah/main/'+get_type_jadwal()+'/' + jenis + '/' + ta + "/detil-usulan/" + config.id_daerah + "/0",
 											type: "post",
 											timeout: 180000,
-											data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
+											data: "_token=" + tokek + '&idusulan=' + id_usulan,
 											success: function (rinciusulan_) {
 												data_usulan_ = usulan;
 												jQuery.extend(data_usulan_, rinciusulan_);
@@ -698,7 +698,7 @@ function inputKamus(jenis,jsondata) {/*Function used to input the JSON array to 
 		}  
 		//data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
 		opsi = {
-			_token : jQuery('meta[name=_token]').attr('content'),
+			_token : tokek,
 			id_kamus: '',
 			jenis_bantuan: '',
 			isu_usulan: jsondata[i]['isu_usulan'],
@@ -792,7 +792,7 @@ function input_rpjmd(jsondata) {/*Function used to input the JSON array to Kamus
 		}  
 		//data: "_token=" + jQuery('meta[name=_token]').attr('content') + '&idusulan=' + id_usulan,
 		opsi = {
-			_token : jQuery('meta[name=_token]').attr('content'),
+			_token : tokek,
 			id_rpjmd: '',
 			visi_rpjmd: jsondata[i]['visi_rpjmd'],
 			misi_rpjmd: jsondata[i]['misi_rpjmd'],

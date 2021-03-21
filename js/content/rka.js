@@ -88,7 +88,7 @@ function tampilAkun(id, jenis_ssh){
   	jQuery.ajax({
         url: config.sipd_url+"daerah/main/budget/komponen/"+config.tahun_anggaran+"/"+jenis_ssh+"/detil-komp/"+config.id_daerah+"/"+id_unit,
         type: "post",
-        data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idkomponen='+id,
+        data: "_token="+tokek+'&idkomponen='+id,
         success: function(data){
         	console.log('data', data);
         	window.data_ssh = data;
@@ -397,7 +397,7 @@ jQuery('#hapus_multi_komponen').on('click', function(){
 						jQuery.ajax({
 			              	url: '../../hapus-rincian/'+config.id_daerah+'/'+id_unit,
 			              	type: "POST",
-			              	data:{"_token": $('meta[name=_token]').attr('content'),"skrim":CR64('kodesbl='+kodesbl+'&idbelanjarinci='+current_data3+'&jeniskk=0')},
+			              	data:{"_token": tokek,"skrim":CR64('kodesbl='+kodesbl+'&idbelanjarinci='+current_data3+'&jeniskk=0')},
 			              	success: function(data){
 			              		resolve_reduce3(nextData3);
 			              	}
@@ -417,7 +417,7 @@ jQuery('#hapus_multi_komponen').on('click', function(){
 				jQuery.ajax({
                     url: "../../refresh-belanja/"+config.id_daerah+'/'+id_unit,
                     type: "post",
-                    data:{"_token":jQuery('meta[name=_token]').attr('content'),"kodesbl":kodesbl},
+                    data:{"_token":tokek,"kodesbl":kodesbl},
                     success: function(hasil){
                       	var res=hasil.split("||");
                       	var pagu, rinci;
@@ -499,7 +499,7 @@ jQuery('#jenis-bel-excel').on('change', function(){
 		jQuery.ajax({
 		    url: "../../cari-rekening/"+config.id_daerah+"/"+id_unit,
 		    type: "post",
-		    data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idbl=0&idsubbl=0'+'&komponenkel='+jenisbl,
+		    data: "_token="+tokek+'&idbl=0&idsubbl=0'+'&komponenkel='+jenisbl,
 		    success: function(data){
 		      	jQuery("#rek-excel").html(data);
 				jQuery('#wrap-loading').hide();
@@ -616,7 +616,7 @@ function insertRKA(){
 								      			jQuery.ajax({
 										          	url: config.sipd_url+"daerah/main/budget/belanja/"+config.tahun_anggaran+"/rinci/simpan-belanjarinci/"+config.id_daerah+"/"+id_unit,
 										          	type: "post",
-										          	data: "_token="+jQuery('meta[name=_token]').attr('content')+'&skrim='+CR64(skrim),
+										          	data: "_token="+tokek+'&skrim='+CR64(skrim),
 										          	success: function(data_kel){
 								      					resolve(raw);
 										          	},
@@ -658,7 +658,7 @@ function insertRKA(){
 			jQuery.ajax({
                 url: "../../refresh-belanja/"+config.id_daerah+"/"+id_unit,
                 type: "post",
-                data:{"_token":jQuery('meta[name=_token]').attr('content'),"kodesbl":jQuery('input[name="kodesbl"]').val()},
+                data:{"_token":tokek,"kodesbl":jQuery('input[name="kodesbl"]').val()},
                 success: function(hasil){
                   	var res=hasil.split("||");
                  	var pagu, rinci;
@@ -704,7 +704,7 @@ function getIdProv(id_unit){
   		jQuery.ajax({
 	      	url: '../../tampil-provinsi/'+config.id_daerah+'/'+id_unit,
 	      	type: "post",
-	      	data: "_token="+$('meta[name=_token]').attr('content')+'&id_unit='+id_unit,
+	      	data: "_token="+tokek+'&id_unit='+id_unit,
 	      	success: function(data_prov){
 	      		resolve(data_prov);
           	},
@@ -720,7 +720,7 @@ function getIdKab(raw){
   		jQuery.ajax({
         	url: "../../tampil-kab-kota/"+config.id_daerah+"/"+raw.id_unit,
         	type: "post",
-        	data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idprop='+raw.id_prov,
+        	data: "_token="+tokek+'&idprop='+raw.id_prov,
             success: function(data_kab){
 	      		var id_kab = jQuery('<select>'+data_kab+'</select>').find('option').filter(function(){
 	      			return jQuery(this).html().toLocaleLowerCase().replace('kab. ', '') == raw.kab.toLocaleLowerCase();
@@ -739,7 +739,7 @@ function getIdKec(raw){
   		jQuery.ajax({
           	url: "../../tampil-camat/"+config.id_daerah+"/"+raw.id_unit,
           	type: "post",
-          	data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idprop='+raw.id_prov+'&idkokab='+raw.id_kab,
+          	data: "_token="+tokek+'&idprop='+raw.id_prov+'&idkokab='+raw.id_kab,
           	success: function(data_kec){
             	var id_kec = jQuery('<select>'+data_kec+'</select>').find('option').filter(function(){
 	      			return jQuery(this).html().toLocaleLowerCase() == raw.kec.toLocaleLowerCase();
@@ -758,7 +758,7 @@ function getIdKel(raw){
 		jQuery.ajax({
 	      	url: "../../tampil-lurah/"+config.id_daerah+"/"+raw.id_unit,
 	      	type: "post",
-	      	data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idprop='+raw.id_prov+'&idkokab='+raw.id_kab+'&idcamat='+raw.id_kec,
+	      	data: "_token="+tokek+'&idprop='+raw.id_prov+'&idkokab='+raw.id_kab+'&idcamat='+raw.id_kec,
 	      	success: function(data_kel){
 	        	var id_kel = jQuery('<select>'+data_kel+'</select>').find('option').filter(function(){
 	      			return jQuery(this).html().toLocaleLowerCase() == raw.desa.toLocaleLowerCase();
@@ -783,7 +783,7 @@ function setKeterangan(raw){
 				jQuery.ajax({
 		          	url: "../../simpan-keterangan/"+config.id_daerah+"/"+raw.id_unit,
 		          	type: "POST",
-		          	data:{"_token": $('meta[name=_token]').attr('content'),"kodesbl":raw.kodesbl,"skrim":CR64('keterangan_add='+raw.keterangan)},
+		          	data:{"_token": tokek,"kodesbl":raw.kodesbl,"skrim":CR64('keterangan_add='+raw.keterangan)},
 		          	success: function(data){
 		          		jQuery("select[name=keterangan]").append('<option value ="'+data['id_ket_sub_bl']+'">'+data['ket_bl_teks']+'</option>');
               			jQuery("select[name=keterangan]").val(data['id_ket_sub_bl']).trigger("change");
@@ -939,7 +939,7 @@ function gantiRekKomponen(type, selected){
 		jQuery.ajax({
 		    url: "../../cari-rekening/"+config.id_daerah+"/"+id_unit,
 		    type: "post",
-		    data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idbl=0&idsubbl=0'+'&komponenkel='+jenisbl,
+		    data: "_token="+tokek+'&idbl=0&idsubbl=0'+'&komponenkel='+jenisbl,
 		    success: function(data){
 		      	jQuery("#pilih-ganti-rek").html(data);
 		      	jQuery("#pilih-ganti-rek").val(rek_asal);
@@ -1045,7 +1045,7 @@ jQuery('#simpan-ganti-rek').on("click", function(){
                 						jQuery.ajax({
                 			              	url: "../../hapus-rincian/"+config.id_daerah+"/"+id_unit,
                 			              	type: "POST",
-                			              	data:{"_token": jQuery('meta[name=_token]').attr('content'),"skrim":CR64('kodesbl='+kodesbl+'&idbelanjarinci='+idblrinci+'&jeniskk=0')},
+                			              	data:{"_token": tokek,"skrim":CR64('kodesbl='+kodesbl+'&idbelanjarinci='+idblrinci+'&jeniskk=0')},
                 			              	success: function(data){
                                                 resolve_redurce2();
                                             }
@@ -1057,7 +1057,7 @@ jQuery('#simpan-ganti-rek').on("click", function(){
     			              		jQuery.ajax({
     						          	url: "../../simpan-belanjarinci/"+config.id_daerah+"/"+id_unit,
     						          	type: "POST",
-    						          	data:{"_token": jQuery('meta[name=_token]').attr('content'),"skrim":CR64(jQuery('#formdetilrincian').serialize())},
+    						          	data:{"_token": tokek,"skrim":CR64(jQuery('#formdetilrincian').serialize())},
     						          	success: function(data){
     			              				resolve_redurce(nextData);
     						          	}
@@ -1092,7 +1092,7 @@ jQuery('#simpan-ganti-rek').on("click", function(){
 			jQuery.ajax({
                 url: "../../refresh-belanja/"+config.id_daerah+"/"+id_unit,
                 type: "post",
-                data:{"_token":jQuery('meta[name=_token]').attr('content'),"kodesbl": kodesbl},
+                data:{"_token":tokek,"kodesbl": kodesbl},
                 success: function(hasil){
                   	var res=hasil.split("||");
                   	var pagu, rinci;

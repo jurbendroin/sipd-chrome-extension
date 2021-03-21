@@ -1484,7 +1484,7 @@ function tampil_semua_halaman(){
 							url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/jadwal/'+config.tahun_anggaran+'/hist-jadwal/'+config.id_daerah+'/0',
 							type: "post",
 							timeout: 30000,
-							data: "_token="+jQuery('meta[name=_token]').attr('content')+'&app=budget&cetak=apbd&model=perda&jenis=3'+'&idskpd='+b.id_skpd+'&idbl=0&idsubbl=0',
+							data: "_token="+tokek+'&app=budget&cetak=apbd&model=perda&jenis=3'+'&idskpd='+b.id_skpd+'&idbl=0&idsubbl=0',
 							success: function(jadwal){
 								var url = jQuery(jadwal.data.filter(function(j, n){
 									return j.setstatus == "Aktif";
@@ -1668,7 +1668,7 @@ function singkron_skpd_ke_lokal(tampil_renja){
 									//url: config.sipd_url+"daerah/main/budget/skpd/"+config.tahun_anggaran+"/detil-skpd/"+config.id_daerah+"/0",
 									type: "post",
 									timeout: 30000,
-									data: "_token="+jQuery('meta[name=_token]').attr('content')+'&idskpd='+b.id_skpd,
+									data: "_token="+tokek+'&idskpd='+b.id_skpd,
 									success: function(data){
 										// jangan gunakan kata unit dari url tampil-skpd dan detil-skpd karena dikhawatirkan tidak konsisten (beda user yg akses bisa beda nilai yang diberikan).
 										// id_unit dari url tampil-skpd menunjuk ke induk organisasi, sedangkan skpd menunjuk ke sub skpd. var sub skpd tidak ada.

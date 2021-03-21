@@ -1043,14 +1043,14 @@ function hapusKomponen(kodesbl,idblrinci){
       	url: '../../hapus-rincian/'+config.id_daerah+'/'+id_unit,
       	type: "POST",
       	data:{
-      		"_token": jQuery('meta[name=_token]').attr('content'),
+      		"_token": tokek,
       		"skrim":CR64('kodesbl='+kodesbl+'&idbelanjarinci='+idblrinci+'&jeniskk=0')
       	},
       	success: function(data){
           	jQuery.ajax({
 	            url: "../../refresh-belanja/"+config.id_daerah+"/"+id_unit,
 	            type: "post",
-	            data:{"_token":jQuery('meta[name=_token]').attr('content'),"kodesbl":kodesbl},
+	            data:{"_token":tokek,"kodesbl":kodesbl},
 	            success: function(hasil){
 	              	var res=hasil.split("||");
 	              	var pagu, rinci;
@@ -1088,7 +1088,7 @@ function singkron_user_deskel_lokal(){
             				jQuery.ajax({
 						      	url: config.sipd_url+'daerah/main/plan/setup-user/'+config.tahun_anggaran+'/kel-desa/detil/'+config.id_daerah+'/0',
 						      	type: "POST",
-	            				data:{"_token":jQuery('meta[name=_token]').attr('content'),"idxuser":current_data.id_user},
+	            				data:{"_token":tokek,"idxuser":current_data.id_user},
 						      	success: function(detil){
 									jQuery.extend(data_deskel.data, detil);
 									delete(data_deskel.data.action);
@@ -1142,7 +1142,7 @@ function singkron_user_dewan_lokal(){
             			jQuery.ajax({
 					      	url: config.sipd_url+'daerah/main/plan/setup-user/'+config.tahun_anggaran+'/anggota-dewan/detil/'+config.id_daerah+'/0',
 					      	type: "POST",
-            				data:{"_token":jQuery('meta[name=_token]').attr('content'),"idxuser":current_data.id_user},
+            				data:{"_token":tokek,"idxuser":current_data.id_user},
 					      	success: function(detil){
 		            			var data_dewan = { 
 									action: 'singkron_user_dewan',
