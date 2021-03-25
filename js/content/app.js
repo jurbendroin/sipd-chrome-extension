@@ -1390,17 +1390,18 @@ jQuery(document).ready(function(){
 	        singkron_renstra_lokal();
 		});
 	 }else if(
-	 	current_url.indexOf('/pendapatan/'+config.tahun_anggaran+'/ang/unit/'+config.id_daerah+'/') != -1
-	 	|| current_url.indexOf('/pendapatan/'+config.tahun_anggaran+'/ang/list/'+config.id_daerah+'/') != -1
+	 	jQuery('h3.page-title').text().indexOf('Pendapatan') != -1
 	 ){
 		console.log('halaman RKA pendapatan');
 		var singkron_lokal = ''
-	        +'<div>'
-	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pendapatan-lokal" style="margin-left: 0px;">'
-	                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
-	            +'</button>'
-	        +'</div>';
-		jQuery('.white-box').prepend(singkron_lokal);
+            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pendapatan-lokal" style="margin-left: 30px;">'
+                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
+            +'</button>';
+        if(jQuery('.m-t-0 .button-box').length == 0){
+			jQuery('.m-t-0').append('<div class="button-box pull-right p-t-20">'+singkron_lokal+'</div>');
+        }else{
+			jQuery('.m-t-0 .button-box').append(singkron_lokal);
+        }
 		jQuery('#singkron-pendapatan-lokal').on('click', function(){
 			jQuery('#wrap-loading').show();
 			jQuery('#persen-loading').attr('total', 1);
@@ -1410,19 +1411,18 @@ jQuery(document).ready(function(){
 			else {singkron_pendapatan_lokal(id_unit);}
 		});
 	}else if(
-	 	current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1
-	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/unit/'+config.id_daerah+'/') != -1
-	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/list/'+config.id_daerah+'/') != -1
-	 	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/pengeluaran/list/'+config.id_daerah+'/') != -1
+	 	jQuery('h3.page-title').text().indexOf('Pembiayaan') != -1
 	){
 		console.log('halaman RKA pembiayaan');
 		var singkron_lokal = ''
-	        +'<div>'
-	            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pembiayaan-lokal" style="margin-left: 0px;">'
-	                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
-	            +'</button>'
-	        +'</div>';
-		jQuery('.white-box').prepend(singkron_lokal);
+            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-pembiayaan-lokal" style="margin-left: 30px;">'
+                    +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
+            +'</button>';
+        if(jQuery('.m-t-0 .button-box').length == 0){
+			jQuery('.m-t-0').append('<div class="button-box pull-right p-t-20">'+singkron_lokal+'</div>');
+        }else{
+			jQuery('.m-t-0 .button-box').append(singkron_lokal);
+        }
 		jQuery('#singkron-pembiayaan-lokal').on('click', function(){
 			var id_unit = window.location.href.split('?')[0].split(''+config.id_daerah+'/')[1];
 	        jQuery('#wrap-loading').show();
@@ -1430,8 +1430,7 @@ jQuery(document).ready(function(){
 			jQuery('#persen-loading').html('0%');
 	        var type = 'pengeluaran';
 	        if(
-	        	current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/unit/'+config.id_daerah+'/') != -1
-	        	|| current_url.indexOf('/pembiayaan/'+config.tahun_anggaran+'/ang/penerimaan/list/'+config.id_daerah+'/') != -1
+	        	jQuery('h3.page-title').text().indexOf('Penerimaan') != -1
 	        ){
 	        	type = 'penerimaan';
 	        }
@@ -1970,7 +1969,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 		if(opsi && opsi.id_unit){
 			id_unit = opsi.id_unit;
 		}
-		var kode_sbl = kodesbl;
+		var kode_sbl = false;
 		var kode_bl = false;
 		var idbl = false;
 		var idsubbl = false;
@@ -1979,6 +1978,7 @@ function singkron_rka_ke_lokal(opsi, callback) {
 		var kode_sub_skpd = false;
 		var pagu = 0;
 		if(!opsi || !opsi.kode_bl){
+			kode_sbl = kodesbl;
 			var _kode_bl = kode_sbl.split('.');
 			_kode_bl.pop();
 			kode_bl = _kode_bl.join('.');

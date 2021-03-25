@@ -95,7 +95,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
 				type: request.message.content.type,
 				data: request.message.content.data,
 				dataType: 'json',
-				timeout: 30000,
+				timeout: 90000,
 				success:function(ret){
 					if(request.message.content.return){
 						var options = {
