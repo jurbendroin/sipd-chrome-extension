@@ -76,7 +76,6 @@ jQuery(document).ready(function(){
 	}
 	window.current_url = window.location.href;
 	// log('__script', __script, lru2);
-	
 	// halaman SSH
 	if(
 		jQuery('h3.page-title').text().indexOf('Komponen') != -1
@@ -1481,9 +1480,10 @@ jQuery(document).ready(function(){
             +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="singkron-asmas-lokal" style="margin-left: 30px;">'
                 +'<i class="fa fa-cloud-download m-r-5"></i> <span>Singkron ke DB Lokal</span>'
             +'</button>'
-            +'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="impor-usulan-apbd1" style="margin-left: 30px;">'
-                +'<i class="fa fa-cloud-download m-r-5"></i> <span>Impor Usulan APBD I</span>'
-            +'</button>';
+			+ '<div style="background: white;padding: 25px;border: lightgrey;border-style: outset;border-width: thin;">'
+			+ '<input type="file" id="excelfile" />'
+			+ '<input type="button" class="fcbtn btn btn-danger btn-outline btn-1b" id="impor-usulan-apbd1" value="Impor Usulan APBD I ke SIPD" />'
+			+'</div>';
 		jQuery('.panel-heading').append(singkron_lokal);
 		jQuery('#singkron-asmas-lokal').on('click', function(){
 	        singkron_asmas_lokal();
@@ -1518,6 +1518,126 @@ jQuery(document).ready(function(){
 		});
 	}
 });
+
+function impor_usulan_apbd1() {
+	var lru3 = document.body.textContent.split('lru3 = "')[1].split('"')[0];
+	var mycookie = document.cookie;
+	var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xlsx|.xls)$/;  
+	/*Checks whether the file is a valid excel file*/  
+	if (regex.test($("#excelfile").val().toLowerCase())) {  
+		var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/  
+		if ($("#excelfile").val().toLowerCase().indexOf("xlsx") > 0) {  
+			xlsxflag = true;  
+		}  
+		/*Checks whether the browser supports HTML5*/  
+		if (typeof (FileReader) != "undefined") {  
+			var reader = new FileReader();  
+			reader.onload = function (e) {  
+				var data = e.target.result;  
+				/*Converts the excel data in to object*/  
+				if (xlsxflag) {  
+					var workbook = XLSX.read(data, { type: 'binary' });  
+				}  
+				else {
+					var workbook = XLS.read(data, { type: 'binary' });  
+				}  
+				/*Gets all the sheetnames of excel in to a variable*/  
+				var sheet_name_list = workbook.SheetNames;  
+ 
+				var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/  
+				sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/  
+					/*Convert the cell value to Json*/  
+					if (xlsxflag) {  
+						var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);  
+					}  
+					else {  
+						var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);  
+					}  
+					if (exceljson.length > 0 && cnt == 0) {  
+						//BindTable(exceljson, '#exceltable');  
+						input_usulan_apbd1(exceljson,lru3,mycookie);
+						cnt++;  
+					}  
+				});  
+			}  
+			if (xlsxflag) {/*If excel file is .xlsx extension than creates a Array Buffer from excel*/  
+				reader.readAsArrayBuffer($("#excelfile")[0].files[0]);  
+			}  
+			else {  
+				reader.readAsBinaryString($("#excelfile")[0].files[0]);  
+			}  
+		}  
+		else {  
+			alert("Sorry! Your browser does not support HTML5!");  
+		}  
+	}  
+	else {  
+		alert("Please upload a valid Excel file!");  
+	}  
+}  
+
+function input_usulan_apbd1(jsondata,lru3,mycookie) {/*Function used to input the JSON array to Kamus Usulan SIPD*/  
+	var columns = getHeader(jsondata); /*Gets all the column headings of Excel*/  
+	//console.log(jsondata);
+	for (var i = 0; i < jsondata.length; i++) {  
+		for (var colIndex = 0; colIndex < columns.length; colIndex++) {  
+			var cellValue = jsondata[i][columns[colIndex]];  
+			if (cellValue == null) cellValue = "";  
+		}
+		var formDataCustom = window.formData;
+		formDataCustom.delete('_token');
+		formDataCustom.append('idusulan', '');
+		formDataCustom.append('tujuanusul', jsondata[i]['tujuanusul']);
+		formDataCustom.append('idkamus', jsondata[i]['idkamus']);
+		formDataCustom.append('volume', '');
+		formDataCustom.append('satuan', '');
+		formDataCustom.append('harga_satuan', '');
+		formDataCustom.append('masalah_teks', jsondata[i]['masalah_teks']);
+		formDataCustom.append('alamat_teks', jsondata[i]['alamat_teks']);
+		formDataCustom.append('lat_peta', '');
+		formDataCustom.append('lang_peta', '');
+		formDataCustom.append('kab_kota', jsondata[i]['kab_kota']);
+		formDataCustom.append('kecamatan', null);
+		formDataCustom.append('kelurahan', null);
+		formDataCustom.append('suratproposal', jsondata[i]['suratproposal']);
+		formDataCustom.append('foto', jsondata[i]['foto']);
+		formDataCustom.append('foto_2', jsondata[i]['foto_2']);
+		formDataCustom.append('foto_3', jsondata[i]['foto_3']);
+
+		jQuery.ajax({
+		    url: lru3,
+			type: 'post',
+			data: formDataCustom,
+			headers: {
+				"X-CSRF-Token": tokek
+			},
+			processData: false,
+			contentType: false,
+		    success:function(ret){
+		        console.log('Input Usulan APBD I',ret);
+		    },
+		    error:function(){
+				console.log('Input Usulan APBD I');
+		    }      
+		});
+	}  
+}  
+
+function getHeader(jsondata) {/*Function used to get all column names from JSON*/  
+	var columnSet = [];  
+	for (var i = 0; i < jsondata.length; i++) {  
+		var rowHash = jsondata[i];  
+		for (var key in rowHash) {  
+			if (rowHash.hasOwnProperty(key)) {  
+				if ($.inArray(key, columnSet) == -1) {/*Adding each unique column names to a variable array*/  
+					columnSet.push(key);  
+				}  
+			}  
+		}  
+	}  
+	// console.log(columnSet);
+	return columnSet;  
+}  
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
