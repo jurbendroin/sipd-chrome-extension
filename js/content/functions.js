@@ -346,81 +346,140 @@ function getDetailPenerima(kode_sbl, rek, nomor_lampiran){
     });
 }
 
+function set_null(nomor){
+	if(nomor<10){
+		nomor = '0'+nomor;
+	}
+	return nomor;
+}
+
+function getKeyCariRinc(kode_get_rka, id_unit, kode_sbl, idbelanjarinci){
+	return new Promise(function(resolve, reject){
+		if(kode_get_rka){
+			resolve(kode_get_rka);
+		}else{
+			if(typeof resolve_get_url == 'undefined'){
+				window.resolve_get_url = {};
+			}
+			resolve_get_url[idbelanjarinci] = resolve;
+			var t = new Date();
+			var data_send = { 
+				action: 'base64_encrypt',
+				api_key: config.api_key,
+				data : {
+					app : 'budget',
+					modul : 'sub_giat_bl',
+					sdata : 'rinci_sub_giat',
+					sview : 'detil_rinci_sbl',
+					stahun : config.tahun_anggaran,
+					sdaerah : config.id_daerah,
+					sidunit : id_unit,
+					kodesbl : kode_sbl,
+					idrincisbl : idbelanjarinci,
+					stime : t.getFullYear()+'-'+set_null((t.getMonth() + 1))+'-'+set_null(t.getDate())
+				}
+			};
+			var data = {
+			    message:{
+			        type: "get-url",
+			        content: {
+					    url: config.url_server_lokal,
+					    type: 'post',
+					    data: data_send,
+		    			return: true
+					}
+			    }
+			};
+			chrome.runtime.sendMessage(data, function(response) {
+			    console.log('responeMessage', response);
+			});
+		}
+	});
+}
+
 function getDetailRin(id_unit, kode_sbl, idbelanjarinci, nomor_lampiran, kode_get_rka){
 	return new Promise(function(resolve, reject){
-		if(!kode_get_rka){
+		if(!kode_get_rka && !config.sipd_private){
 			return resolve(false);
 		}
-		getToken().then(function(_token){
-			(function runAjax(retries, delay){
-				delay = delay || 30000;
-				jQuery.ajax({
-					// url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/cari-rincian/'+config.id_daerah+'/'+id_unit,
-					url: config.sipd_url+'daerah/main?'+kode_get_rka,
-					type: 'POST',
-					data: formData,
-					processData: false,
-					contentType: false,
-					timeout: 30000,
-					success: function(rinci){
-						if(nomor_lampiran == 5){
-							getProv(id_unit).then(function(prov){
-								if(prov[rinci.id_prop_penerima]){
-									rinci.nama_prop = prov[rinci.id_prop_penerima].nama;
-									getKab(id_unit, rinci.id_prop_penerima).then(function(kab){
-										if(kab[rinci.id_kokab_penerima]){
-											rinci.nama_kab = kab[rinci.id_kokab_penerima].nama;
-											getKec(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima).then(function(kec){
-												if(kec[rinci.id_camat_penerima]){
-													rinci.nama_kec = kec[rinci.id_camat_penerima].nama;
-													getKel(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima, rinci.id_camat_penerima).then(function(kel){
-														if(kel[rinci.id_lurah_penerima]){
-															rinci.nama_kel = kel[rinci.id_lurah_penerima].nama;
-															return resolve(rinci);
-														}else{
-															return resolve(rinci);
-														}
-													});
-												}else{
-													return resolve(rinci);
-												}
-											});
-										}else{
-											return resolve(rinci);
-										}
-									});
-								}else{
-									return resolve(rinci);
-								}
-							});
-						}else{
-							return resolve(rinci);
+		getKeyCariRinc(kode_get_rka, id_unit, kode_sbl, idbelanjarinci).then(function(kode_get_rka){
+			getToken().then(function(_token){
+				(function runAjax(retries, delay){
+					delay = delay || 30000;
+					jQuery.ajax({
+						// url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/cari-rincian/'+config.id_daerah+'/'+id_unit,
+						url: config.sipd_url+'daerah/main?'+kode_get_rka,
+						type: 'POST',
+						data: formData,
+						processData: false,
+						contentType: false,
+						timeout: 30000,
+						success: function(rinci){
+							if(nomor_lampiran == 5){
+								getProv(id_unit, rincsub[kode_sbl].lru4).then(function(prov){
+									if(prov[rinci.id_prop_penerima]){
+										rinci.nama_prop = prov[rinci.id_prop_penerima].nama;
+										getKab(id_unit, rinci.id_prop_penerima, id_unit, rincsub[kode_sbl].lru5).then(function(kab){
+											if(kab[rinci.id_kokab_penerima]){
+												rinci.nama_kab = kab[rinci.id_kokab_penerima].nama;
+												getKec(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima, id_unit, rincsub[kode_sbl].lru6).then(function(kec){
+													if(kec[rinci.id_camat_penerima]){
+														rinci.nama_kec = kec[rinci.id_camat_penerima].nama;
+														getKel(id_unit, rinci.id_prop_penerima, rinci.id_kokab_penerima, rinci.id_camat_penerima, id_unit, rincsub[kode_sbl].lru7).then(function(kel){
+															if(kel[rinci.id_lurah_penerima]){
+																rinci.nama_kel = kel[rinci.id_lurah_penerima].nama;
+																return resolve(rinci);
+															}else{
+																return resolve(rinci);
+															}
+														});
+													}else{
+														return resolve(rinci);
+													}
+												});
+											}else{
+												return resolve(rinci);
+											}
+										});
+									}else{
+										return resolve(rinci);
+									}
+								});
+							}else{
+								return resolve(rinci);
+							}
 						}
-					}
-				})
-				.fail(function(){
-					if (retries > 0 ) {
-						console.log('Koneksi error. Coba lagi',retries); // prrint retry count
-						setTimeout(function(){
-							runAjax(--retries);
-						},delay);
-					} else {
-						console.log('Koneksi error. Gagal mengambil data.');
-					}
-				})
-			})(20);
+					})
+					.fail(function(){
+						if (retries > 0 ) {
+							console.log('Koneksi error. Coba lagi',retries); // prrint retry count
+							setTimeout(function(){
+								runAjax(--retries);
+							},delay);
+						} else {
+							console.log('Koneksi error. Gagal mengambil data.');
+						}
+					})
+				})(20);
+			});
 		});
 	});
 }
 
-function getKel(id_unit, id_prov, id_kab, id_kec){
+function getKel(id_unit, id_prov, id_kab, id_kec, url){
 	return new Promise(function(resolve, reject){
 		if(typeof(alamat.kab[id_prov].kec[id_kab].kel[id_kec]) == 'undefined'){
 			getToken().then(function(_token){
+				var formDataCustom = new FormData();
+				formDataCustom.append('_token', tokek);
+				formDataCustom.append('skrim', Curut('idprop='+id_prov+'&idkokab='+id_kab+'&idcamat='+id_kec));
 				jQuery.ajax({
-					url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-lurah/'+config.id_daerah+'/'+id_unit,
+					// url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-lurah/'+config.id_daerah+'/'+id_unit,
+					url: url,
 					type: 'post',
-					data: "_token="+_token+'&idprop='+id_prov+'&idkokab='+id_kab+'&idcamat='+id_kec,
+					data: formDataCustom,
+					processData: false,
+  					contentType: false,
 					success: function(ret){
 						if(!alamat.kab[id_prov].kec[id_kab].kel[id_kec]){
 							alamat.kab[id_prov].kec[id_kab].kel[id_kec] = {};
@@ -445,14 +504,20 @@ function getKel(id_unit, id_prov, id_kab, id_kec){
 	});
 }
 
-function getKec(id_unit, id_prov, id_kab){
+function getKec(id_unit, id_prov, id_kab, url){
 	return new Promise(function(resolve, reject){
 		if(typeof(alamat.kab[id_prov].kec[id_kab]) == 'undefined'){
+			var formDataCustom = new FormData();
+			formDataCustom.append('_token', tokek);
+			formDataCustom.append('skrim', Curut('idprop='+id_prov+'&idkokab='+id_kab));
 			getToken().then(function(_token){
 				jQuery.ajax({
-					url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-camat/'+config.id_daerah+'/'+id_unit,
+					// url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-camat/'+config.id_daerah+'/'+id_unit,
+					url: url,
 					type: 'post',
-					data: "_token="+_token+'&idprop='+id_prov+'&idkokab='+id_kab,
+					data: formDataCustom,
+					processData: false,
+  					contentType: false,
 					success: function(ret){
 						if(!alamat.kab[id_prov].kec[id_kab]){
 							alamat.kab[id_prov].kec[id_kab] = {
@@ -479,14 +544,20 @@ function getKec(id_unit, id_prov, id_kab){
 	});
 }
 
-function getKab(id_unit, id_prov){
+function getKab(id_unit, id_prov, url){
 	return new Promise(function(resolve, reject){
 		if(typeof(alamat.kab[id_prov]) == 'undefined'){
+			var formDataCustom = new FormData();
+			formDataCustom.append('_token', tokek);
+			formDataCustom.append('skrim', Curut('idprop='+id_prov));
 			getToken().then(function(_token){
 				jQuery.ajax({
-					url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-kab-kota/'+config.id_daerah+'/'+id_unit,
+					// url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-kab-kota/'+config.id_daerah+'/'+id_unit,
+					url: url,
 					type: 'post',
-					data: "_token="+_token+'&idprop='+id_prov,
+					data: formDataCustom,
+					processData: false,
+  					contentType: false,
 					success: function(ret){
 						if(!alamat.kab[id_prov]){
 							alamat.kab[id_prov] = {
@@ -513,14 +584,17 @@ function getKab(id_unit, id_prov){
 	});
 }
 
-function getProv(id_unit){
+function getProv(id_unit, url){
 	return new Promise(function(resolve, reject){
 		if(typeof(alamat) == 'undefined'){
 			getToken().then(function(_token){
 				jQuery.ajax({
-					url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-provinsi/'+config.id_daerah+'/'+id_unit,
+					// url: config.sipd_url+'daerah/main/'+get_type_jadwal()+'/belanja/'+config.tahun_anggaran+'/rinci/tampil-provinsi/'+config.id_daerah+'/'+id_unit,
+					url: url,
 					type: 'post',
-					data: "_token="+_token+'&idunit='+id_unit,
+					data: FormData,
+					processData: false,
+  					contentType: false,
 					success: function(ret){
 						alamat = {
 							kab: {}
@@ -727,7 +801,7 @@ function singkron_master_cse(val){
 		});
 	}else if(val == 'alamat'){
 		var id_unit = 0;
-		getProv(id_unit).then(function(prov){
+		getProv(id_unit, lru4).then(function(prov){
 			var data_alamat = { 
 				action: 'singkron_alamat',
 				tahun_anggaran: config.tahun_anggaran,
