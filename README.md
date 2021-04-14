@@ -47,6 +47,9 @@ Semoga bermanfaat
 - Integrasi data SIPD ke SIMDA keuangan
 - Nama TAPD lebih dari 8 orang
 - Get data rincian murni untuk printout APBD Penjabaran di wp-sipd lokal
+- Export data usulan ASMAS
+- Export data usulan POKIR
+- Allow chrome browser for SIPD
 
 ### Pengembangan berikutnya:
 - Melengkapi dokumentasi penggunaan di halaman wiki

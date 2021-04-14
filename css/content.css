@@ -145,3 +145,8 @@ thead{
 .swal-footer{
     text-align: center;
 }
+#timer {
+    width: 250px!important;
+    text-align: center;
+    padding-bottom: 80px;
+}

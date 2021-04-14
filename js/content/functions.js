@@ -402,9 +402,33 @@ function getKeyCariRinc(kode_get_rka, id_unit, kode_sbl, idbelanjarinci){
 
 function getDetailRin(id_unit, kode_sbl, idbelanjarinci, nomor_lampiran, kode_get_rka){
 	return new Promise(function(resolve, reject){
-		if(!kode_get_rka && !config.sipd_private){
-			return resolve(false);
+	if(!kode_get_rka && !config.sipd_private){
+		if(typeof resolve_get_url == 'undefined'){
+			window.resolve_get_url = {};
 		}
+		resolve_get_url[idbelanjarinci] = resolve;
+		var data_send = { 
+			action: 'get_data_rka',
+			api_key: config.api_key,
+			tahun_anggaran: config.tahun_anggaran,
+			kode_sbl: kode_sbl,
+			idbelanjarinci: idbelanjarinci
+		};
+		var data = {
+			message:{
+				type: "get-url",
+				content: {
+					url: config.url_server_lokal,
+					type: 'post',
+					data: data_send,
+					return: true
+				}
+			}
+		};
+		chrome.runtime.sendMessage(data, function(response) {
+			console.log('responeMessage', response);
+		});
+	}else{
 		getKeyCariRinc(kode_get_rka, id_unit, kode_sbl, idbelanjarinci).then(function(kode_get_rka){
 			getToken().then(function(_token){
 				(function runAjax(retries, delay){
@@ -466,7 +490,8 @@ function getDetailRin(id_unit, kode_sbl, idbelanjarinci, nomor_lampiran, kode_ge
 				})(20);
 			});
 		});
-	});
+	}
+});
 }
 
 function getKel(id_unit, id_prov, id_kab, id_kec, url){
@@ -655,8 +680,14 @@ function formatRupiah(angka, prefix){
 	if(!angka || angka == '' || angka <= 0){
 		angka = '0';
 	}
-	var number_string = angka.replace(/[^,\d]/g, '').toString(),
-	split   		= number_string.split(','),
+	try {
+		angka += '';
+		var number_string = angka.replace(/[^,\d]/g, '').toString();
+	}catch(e){
+		console.log('angka', e, angka);
+		var number_string = '0';
+	}
+	var split   		= number_string.split(','),
 	sisa     		= split[0].length % 3,
 	rupiah     		= split[0].substr(0, sisa),
 	ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
@@ -772,8 +803,20 @@ function getAkunByJenisBl(jenis_bl, id_unit, kode_sbl){
 function singkron_master_cse(val){
 	jQuery('#wrap-loading').show();
 	console.log('val', val);
+	if(typeof rincsub == 'undefined'){
+		window.rincsub = {};
+	}
+	rincsub[kodesbl] = {
+		lru1: lru1,
+		lru3: lru3,
+		lru4: lru4,
+		lru5: lru5,
+		lru6: lru6,
+		lru7: lru7,
+		lru13: lru13
+	};
 	if(val == 'penerima_bantuan'){
-		getDetailPenerima('0', false, 0).then(function(_data){
+		getDetailPenerima(kodesbl, false, 0).then(function(_data){
 			var data_profile = { 
 				action: 'singkron_penerima_bantuan',
 				tahun_anggaran: config.tahun_anggaran,
@@ -846,7 +889,7 @@ function singkron_master_cse(val){
 					return sequence.then(function(current_data){
 						return new Promise(function(resolve_reduce, reject_reduce){
 							// console.log('current_data', current_data);
-							getKab(id_unit, current_data.id_alamat).then(function(kab){
+							getKab(id_unit, current_data.id_alamat, lru5).then(function(kab){
 								var data_alamat_kab = { 
 									action: 'singkron_alamat',
 									tahun_anggaran: config.tahun_anggaran,
@@ -888,7 +931,7 @@ function singkron_master_cse(val){
 										return sequence2.then(function(current_data2){
 											return new Promise(function(resolve_reduce2, reject_reduce2){
 												// console.log('current_data2', current_data2);
-												getKec(id_unit, current_data2.id_prov, current_data2.id_alamat).then(function(kec){
+												getKec(id_unit, current_data2.id_prov, current_data2.id_alamat, lru6).then(function(kec){
 													var data_alamat_kec = { 
 														action: 'singkron_alamat',
 														tahun_anggaran: config.tahun_anggaran,
@@ -930,7 +973,7 @@ function singkron_master_cse(val){
 															return sequence3.then(function(current_data3){
 																return new Promise(function(resolve_reduce3, reject_reduce3){
 																	// console.log('current_data3', current_data3);
-																	getKel(id_unit, current_data3.id_prov, current_data3.id_kab, current_data3.id_alamat).then(function(kel){
+																	getKel(id_unit, current_data3.id_prov, current_data3.id_kab, current_data3.id_alamat, lru7).then(function(kel){
 																		var data_alamat_kel = { 
 																			action: 'singkron_alamat',
 																			tahun_anggaran: config.tahun_anggaran,
@@ -1587,21 +1630,21 @@ function singkron_asmas_lokal(){
 						data_asmas.nama_user = current_data.nama_user;
 						data_asmas.nip = current_data.nip;
 						data_asmas.pengusul = current_data.pengusul;
-						data_asmas.rekom_camat_anggaran = current_data.anggaran;
-						data_asmas.rekom_camat_koefisien = current_data.koefisien;
-						data_asmas.rekom_camat_rekomendasi = current_data.rekomendasi;
-						data_asmas.rekom_lurah_anggaran = current_data.anggaran;
-						data_asmas.rekom_lurah_koefisien = current_data.koefisien;
-						data_asmas.rekom_lurah_rekomendasi = current_data.rekomendasi;
-						data_asmas.rekom_mitra_anggaran = current_data.anggaran;
-						data_asmas.rekom_mitra_koefisien = current_data.koefisien;
-						data_asmas.rekom_mitra_rekomendasi = current_data.rekomendasi;
-						data_asmas.rekom_skpd_anggaran = current_data.anggaran;
-						data_asmas.rekom_skpd_koefisien = current_data.koefisien;
-						data_asmas.rekom_skpd_rekomendasi = current_data.rekomendasi;
-						data_asmas.rekom_tapd_anggaran = current_data.anggaran;
-						data_asmas.rekom_tapd_koefisien = current_data.koefisien;
-						data_asmas.rekom_tapd_rekomendasi = current_data.rekomendasi;
+						data_asmas.rekom_camat_anggaran = current_data.rekom_camat.anggaran;
+						data_asmas.rekom_camat_koefisien = current_data.rekom_camat.koefisien;
+						data_asmas.rekom_camat_rekomendasi = current_data.rekom_camat.rekomendasi;
+						data_asmas.rekom_lurah_anggaran = current_data.rekom_lurah.anggaran;
+						data_asmas.rekom_lurah_koefisien = current_data.rekom_lurah.koefisien;
+						data_asmas.rekom_lurah_rekomendasi = current_data.rekom_lurah.rekomendasi;
+						data_asmas.rekom_mitra_anggaran = current_data.rekom_mitra.anggaran;
+						data_asmas.rekom_mitra_koefisien = current_data.rekom_mitra.koefisien;
+						data_asmas.rekom_mitra_rekomendasi = current_data.rekom_mitra.rekomendasi;
+						data_asmas.rekom_skpd_anggaran = current_data.rekom_skpd.anggaran;
+						data_asmas.rekom_skpd_koefisien = current_data.rekom_skpd.koefisien;
+						data_asmas.rekom_skpd_rekomendasi = current_data.rekom_skpd.rekomendasi;
+						data_asmas.rekom_tapd_anggaran = current_data.rekom_tapd.anggaran;
+						data_asmas.rekom_tapd_koefisien = current_data.rekom_tapd.koefisien;
+						data_asmas.rekom_tapd_rekomendasi = current_data.rekom_tapd.rekomendasi;
 						data_asmas.rev_skpd = current_data.rev_skpd;
 						data_asmas.satuan = current_data.satuan;
 						data_asmas.status_usul = current_data.status_usul;
@@ -1656,7 +1699,7 @@ function singkron_asmas_lokal(){
 						                    api_key: config.api_key,
 						                    data: data_asmas
 						                },
-						            	return: true
+						            	return: false
 						            }
 							    }
 							};
@@ -1678,6 +1721,7 @@ function singkron_asmas_lokal(){
             }, Promise.resolve(data.data[last]))
             .then(function(data_last){
             	jQuery('#wrap-loading').hide();
+            	alert('Berhasil singkron data ASMAS!');
             })
             .catch(function(e){
                 console.log(e);
@@ -1692,6 +1736,165 @@ function get_detail_asmas(idusulan){
 	      	url: endog+'?'+idusulan,
 	      	type: "POST",
 			data: formData,
+			processData: false,
+			contentType: false,
+	      	success: function(data){
+	      		return resolve(data);
+	      	}
+	    });
+    });
+}
+
+function singkron_pokir_lokal(){
+	jQuery('#wrap-loading').show();
+	jQuery.ajax({
+      	url: window.location.href.replace(config.tahun_anggaran+'/', config.tahun_anggaran+'/tampil-monitor/'),
+      	type: "GET",
+		processData: false,
+		contentType: false,
+      	success: function(data){
+      		var last = data.data.length-1;
+      		data.data.reduce(function(sequence, nextData){
+                return sequence.then(function(current_data){
+            		return new Promise(function(resolve_reduce, reject_reduce){
+            			var data_pokir = {};
+		      			data_pokir.alamat_teks = current_data.alamat_teks;
+						data_pokir.anggaran = current_data.anggaran;
+						data_pokir.batal_teks = current_data.batal_teks;
+						data_pokir.bidang_urusan = current_data.bidang_urusan;
+						data_pokir.created_date = current_data.created_date;
+						data_pokir.created_user = current_data.created_user;
+						data_pokir.file_foto = current_data.file_foto;
+						data_pokir.file_pengantar = current_data.file_pengantar;
+						data_pokir.file_proposal = current_data.file_proposal;
+						data_pokir.file_rab = current_data.file_rab;
+						data_pokir.fraksi_dewan = current_data.fraksi_dewan;
+						data_pokir.giat_teks = current_data.giat_teks;
+						data_pokir.id_bidang_urusan = current_data.id_bidang_urusan;
+						data_pokir.id_jenis_usul = current_data.id_jenis_usul;
+						data_pokir.id_kab_kota = current_data.id_kab_kota;
+						data_pokir.id_kecamatan = current_data.id_kecamatan;
+						data_pokir.id_kelurahan = current_data.id_kelurahan;
+						data_pokir.id_pengusul = current_data.id_pengusul;
+						data_pokir.id_reses = current_data.id_reses;
+						data_pokir.id_unit = current_data.id_unit;
+						data_pokir.id_usulan = current_data.id_usulan;
+						data_pokir.is_batal = current_data.is_batal;
+						data_pokir.is_tolak = current_data.is_tolak;
+						data_pokir.jenis_belanja = current_data.jenis_belanja;
+						data_pokir.jenis_usul_teks = current_data.jenis_usul_teks;
+						data_pokir.kelompok = current_data.kelompok;
+						data_pokir.kode_skpd = current_data.kode_skpd;
+						data_pokir.koefisien = current_data.koefisien;
+						data_pokir.lokus_usulan = current_data.lokus_usulan;
+						data_pokir.masalah = current_data.masalah;
+						data_pokir.nama_daerah = current_data.nama_daerah;
+						data_pokir.nama_skpd = current_data.nama_skpd;
+						data_pokir.nama_user = current_data.nama_user;
+						data_pokir.pengusul = current_data.pengusul;
+						data_pokir.rekom_mitra_anggaran = current_data.rekom_mitra.anggaran;
+						data_pokir.rekom_mitra_koefisien = current_data.rekom_mitra.koefisien;
+						data_pokir.rekom_mitra_rekomendasi = current_data.rekom_mitra.rekomendasi;
+						data_pokir.rekom_setwan_anggaran = current_data.rekom_setwan.anggaran;
+						data_pokir.rekom_setwan_koefisien = current_data.rekom_setwan.koefisien;
+						data_pokir.rekom_setwan_rekomendasi = current_data.rekom_setwan.rekomendasi;
+						data_pokir.rekom_skpd_anggaran = current_data.rekom_skpd.anggaran;
+						data_pokir.rekom_skpd_koefisien = current_data.rekom_skpd.koefisien;
+						data_pokir.rekom_skpd_rekomendasi = current_data.rekom_skpd.rekomendasi;
+						data_pokir.rekom_tapd_anggaran = current_data.rekom_tapd.anggaran;
+						data_pokir.rekom_tapd_koefisien = current_data.rekom_tapd.koefisien;
+						data_pokir.rekom_tapd_rekomendasi = current_data.rekom_tapd.rekomendasi;
+						data_pokir.satuan = current_data.satuan;
+						data_pokir.status_usul = current_data.status_usul;
+						data_pokir.status_usul_teks = current_data.status_usul_teks;
+						data_pokir.tolak_teks = current_data.tolak_teks;
+
+						var idusulan = current_data.action.split("detilUsulan('")[1].split("'")[0];
+            			get_detail_pokir(idusulan).then(function(detail){
+							data_pokir.detail_alamatteks = detail.alamatteks;
+							data_pokir.detail_anggaran = detail.anggaran;
+							data_pokir.detail_bidangurusan = detail.bidangurusan;
+							data_pokir.detail_camatteks = detail.camatteks;
+							data_pokir.detail_filefoto = detail.filefoto;
+							data_pokir.detail_filefoto2 = detail.filefoto2;
+							data_pokir.detail_filefoto3 = detail.filefoto3;
+							data_pokir.detail_filepengantar = detail.filepengantar;
+							data_pokir.detail_fileproposal = detail.fileproposal;
+							data_pokir.detail_filerab = detail.filerab;
+							data_pokir.detail_gagasan = detail.gagasan;
+							data_pokir.detail_idcamat = detail.idcamat;
+							data_pokir.detail_idkabkota = detail.idkabkota;
+							data_pokir.detail_idkamus = detail.idkamus;
+							data_pokir.detail_idlurah = detail.idlurah;
+							data_pokir.detail_idskpd = detail.idskpd;
+							data_pokir.detail_jenisbelanja = detail.jenisbelanja;
+							data_pokir.detail_kodeskpd = detail.kodeskpd;
+							data_pokir.detail_langpeta = detail.langpeta;
+							data_pokir.detail_latpeta = detail.latpeta;
+							data_pokir.detail_lurahteks = detail.lurahteks;
+							data_pokir.detail_masalah = detail.masalah;
+							data_pokir.detail_namakabkota = detail.namakabkota;
+							data_pokir.detail_namaskpd = detail.namaskpd;
+							data_pokir.detail_rekomteks = detail.rekomteks;
+							data_pokir.detail_satuan = detail.satuan;
+							data_pokir.detail_setStatusUsul = detail.setStatusUsul;
+							data_pokir.detail_subgiat = detail.subgiat;
+							data_pokir.detail_usulanggaran = detail.usulanggaran;
+							data_pokir.detail_usulvolume = detail.usulvolume;
+							data_pokir.detail_volume = detail.volume;
+
+							var data = {
+							    message:{
+							        type: "get-url",
+							        content: {
+						                url: config.url_server_lokal,
+						                type: 'post',
+						                data: { 
+						                    action: 'singkron_pokir',
+						                    tahun_anggaran: config.tahun_anggaran,
+						                    api_key: config.api_key,
+						                    data: data_pokir
+						                },
+						            	return: false
+						            }
+							    }
+							};
+							chrome.runtime.sendMessage(data, function(response) {
+							    console.log('responeMessage', response);
+							});
+							return resolve_reduce(nextData);
+						});
+            		})
+                    .catch(function(e){
+                        console.log(e);
+                        return Promise.resolve(nextData);
+                    });
+                })
+                .catch(function(e){
+                    console.log(e);
+                    return Promise.resolve(nextData);
+                });
+            }, Promise.resolve(data.data[last]))
+            .then(function(data_last){
+            	jQuery('#wrap-loading').hide();
+            	alert('Berhasil singkron data ASMAS!');
+            })
+            .catch(function(e){
+                console.log(e);
+            });
+      	}
+    });
+}
+
+function get_detail_pokir(idusulan){
+    return new Promise(function(resolve, reject){
+    	var formDataCustom = new FormData();
+		formDataCustom.append('_token', tokek);
+		formDataCustom.append('idusulan', idusulan);
+		jQuery.ajax({
+	      	url: window.location.href.replace(config.tahun_anggaran+'/', config.tahun_anggaran+'/detil-usulan/'),
+	      	type: "POST",
+			data: formDataCustom,
 			processData: false,
 			contentType: false,
 	      	success: function(data){
