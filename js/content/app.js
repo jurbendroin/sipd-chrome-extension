@@ -14,8 +14,13 @@ for(var i=0, l=_s.length; i<l; i++){
 eval(__script);
 console.log('__script', __script);
 
+if(typeof tokek == 'undefined'){
+	tokek = jQuery('input[name="_tawon"]').val();
+}
+
 window.formData = new FormData();
 if(typeof tokek != 'undefined'){
+	console.log('tokek', tokek);
 	formData.append('_token', tokek);
 }
 
@@ -102,9 +107,9 @@ jQuery(document).ready(function(){
 			+'</button>';
 		jQuery('#table_komponen').closest('form').prepend(_show_id_ssh);
 		if(document.getElementsByClassName('tambah-komponen').length){ 
-	 		jQuery('#show_id_ssh').attr('style', 'margin-top: -40px; position: absolute; margin-left: 280px;');
+	 		jQuery('#show_id_ssh').attr('style', 'margin-left: 10px;');
 			var acion_all = ''
-				+'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="set_mulit_rek" style="margin-top: -40px; position: absolute;">'
+				+'<button onclick="return false;" class="fcbtn btn btn-danger btn-outline btn-1b" id="set_mulit_rek">'
 					+'<span>Set Multi Kode SH dan Rek. Belanja</span>'
 				+'</button>';
 			jQuery('#table_komponen').closest('form').prepend(acion_all);
@@ -764,7 +769,7 @@ jQuery(document).ready(function(){
             		+'<option value="penerima_bantuan">Master Data Penerima Bantuan</option>'
             		+'<option value="alamat">Master Data Provinsi, Kabupaten/Kota, Kecamatan, Desa/Kelurahan</option>'
             	+'</select>';
-			jQuery('.bg-title .col-lg-6').eq(1).prepend()(master_html);
+			jQuery('.bg-title .col-lg-6').eq(1).prepend(master_html);
 			jQuery('#singkron_master_cse').on('click', function(){
 				var val = jQuery('#data_master_cse').val();
 				if(val == ''){
